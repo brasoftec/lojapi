@@ -1,0 +1,26 @@
+# Dependências
+node_modules/
+dist/
+
+# Ambiente
+.env
+.env.local
+
+# Banco SQLite
+prisma/dev.db
+prisma/dev.db-journal
+
+# Uploads
+uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/

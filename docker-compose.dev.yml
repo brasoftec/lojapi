@@ -1,0 +1,25 @@
+version: '3.9'
+
+# Ambiente de desenvolvimento com SQLite (sem PostgreSQL)
+# Uso: docker-compose -f docker-compose.dev.yml up
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: lojapi-dev
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      DATABASE_URL: file:./dev.db
+      JWT_SECRET: dev-secret-key
+      JWT_EXPIRES_IN: 7d
+      PORT: 3001
+      NODE_ENV: development
+      RATE_LIMIT_MAX: 1000
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./uploads:/app/uploads

@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = env("DATABASE_PROVIDER")
+  url      = env("DATABASE_URL")
+}
+
+// ─── ADMIN GLOBAL ────────────────────────────────────────────────────────────
+
+model AdminUser {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      String    @default("ADMIN")
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("admin_users")
+}
+
+// ─── LOJAS ───────────────────────────────────────────────────────────────────
+
+model Store {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  email       String   @unique
+  phone       String?
+  document    String?
+  logo        String?
+  banner      String?
+  description String?
+  address     String?  // JSON serializado
+  settings    String?  // JSON serializado
+  active      Boolean  @default(true)
+  plan        String   @default("FREE")
+  apiKey      String   @unique @default(uuid())
+  webhookUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  storeUsers  StoreUser[]
+  products    Product[]
+  categories  Category[]
+  customers   Customer[]
+  orders      Order[]
+  webhooks    WebhookLog[]
+
+  @@map("stores")
+}
+
+// ─── USUÁRIOS DA LOJA ────────────────────────────────────────────────────────
+
+model StoreUser {
+  id        String   @id @default(uuid())
+  storeId   String
+  name      String
+  email     String
+  password  String
+  role      String   @default("MANAGER")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, email])
+  @@map("store_users")
+}
+
+// ─── CATEGORIAS ──────────────────────────────────────────────────────────────
+
+model Category {
+  id          String   @id @default(uuid())
+  storeId     String
+  name        String
+  slug        String
+  description String?
+  image       String?
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  products    Product[]
+
+  @@unique([storeId, slug])
+  @@map("categories")
+}
+
+// ─── PRODUTOS ────────────────────────────────────────────────────────────────
+
+model Product {
+  id           String   @id @default(uuid())
+  storeId      String
+  categoryId   String?
+  name         String
+  slug         String
+  description  String?
+  price        Float
+  comparePrice Float?
+  cost         Float?
+  sku          String?
+  barcode      String?
+  stock        Int      @default(0)
+  trackStock   Boolean  @default(true)
+  images       String   @default("[]") // JSON array serializado
+  attributes   String?  // JSON serializado
+  active       Boolean  @default(true)
+  featured     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  store        Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category     Category?  @relation(fields: [categoryId], references: [id])
+  orderItems   OrderItem[]
+
+  @@unique([storeId, slug])
+  @@map("products")
+}
+
+// ─── CLIENTES ────────────────────────────────────────────────────────────────
+
+model Customer {
+  id        String   @id @default(uuid())
+  storeId   String
+  name      String
+  email     String
+  phone     String?
+  document  String?
+  birthDate DateTime?
+  addresses String   @default("[]") // JSON array serializado
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders    Order[]
+
+  @@unique([storeId, email])
+  @@map("customers")
+}
+
+// ─── PEDIDOS ─────────────────────────────────────────────────────────────────
+
+model Order {
+  id              String   @id @default(uuid())
+  storeId         String
+  customerId      String?
+  orderNumber     String
+  status          String   @default("PENDING")
+  paymentStatus   String   @default("PENDING")
+  paymentMethod   String?
+  subtotal        Float
+  discount        Float    @default(0)
+  shipping        Float    @default(0)
+  total           Float
+  notes           String?
+  shippingAddress String?  // JSON serializado
+  metadata        String?  // JSON serializado
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  store           Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customer        Customer?  @relation(fields: [customerId], references: [id])
+  items           OrderItem[]
+
+  @@unique([storeId, orderNumber])
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String  @id @default(uuid())
+  orderId    String
+  productId  String?
+  name       String
+  sku        String?
+  price      Float
+  quantity   Int
+  total      Float
+  attributes String? // JSON serializado
+
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product? @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+// ─── WEBHOOKS ────────────────────────────────────────────────────────────────
+
+model WebhookLog {
+  id        String   @id @default(uuid())
+  storeId   String
+  event     String
+  payload   String   // JSON serializado
+  status    Int      @default(0)
+  response  String?
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@map("webhook_logs")
+}

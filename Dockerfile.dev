@@ -1,0 +1,20 @@
+# Dockerfile para desenvolvimento com hot-reload
+FROM node:20-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache openssl
+
+COPY package*.json ./
+RUN npm install
+
+COPY tsconfig.json ./
+COPY prisma ./prisma
+
+RUN npx prisma generate
+
+COPY src ./src
+
+EXPOSE 3001
+
+CMD ["sh", "-c", "npx prisma migrate dev --name init && npm run dev"]
