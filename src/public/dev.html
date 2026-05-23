@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>lojapi — Developer Portal</title>
+<link rel="icon" href="https://ofertatop.com.br/assets/img/ofertatop.png">
+<link rel="stylesheet" href="https://font.brasoftec.com.br/fonts/instrument-sans/instrument-sans.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--surface:#18181b;--border:#27272a;--border2:#3f3f46;
+  --text:#fafafa;--muted:#71717a;--accent:#6366f1;--accent2:#818cf8;
+  --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--blue:#3b82f6;
+  --font:'Instrument Sans',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh}
+button{cursor:pointer;font-family:var(--font);font-size:14px}
+input,select,textarea{font-family:var(--font);font-size:14px}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.login-logo img{width:32px;height:32px;border-radius:8px}
+.login-logo span{font-size:20px;font-weight:700;letter-spacing:-.5px}
+.login-sub{color:var(--muted);font-size:13px;margin-bottom:28px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);outline:none;transition:.15s}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:8px;border:none;font-weight:600;transition:.15s;white-space:nowrap;font-size:14px}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(239,68,68,.3)}.btn-danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-full{width:100%}
+.err-box{background:#450a0a22;border:1px solid var(--red);border-radius:8px;padding:10px 14px;color:var(--red);font-size:13px;margin-bottom:16px;display:none}
+
+/* APP */
+#app{display:none;min-height:100vh;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.tl{display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.logo img{width:24px;height:24px;border-radius:6px}
+.store-pill{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--muted)}
+.store-pill b{color:var(--text)}
+.tr{display:flex;align-items:center;gap:8px}
+.user-chip{font-size:12px;color:var(--muted);text-align:right}
+.user-chip b{display:block;color:var(--text);font-size:13px}
+
+/* LAYOUT */
+.layout{display:flex;flex:1}
+.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);padding:14px 10px;flex-shrink:0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto}
+.nav-sec{margin-bottom:18px}
+.nav-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:5px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;color:var(--muted);cursor:pointer;transition:.12s;font-weight:500;border:none;background:transparent;width:100%;text-align:left;font-size:13px}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--accent);color:#fff}
+.nav-item svg{width:14px;height:14px;flex-shrink:0}
+.main{flex:1;padding:28px;max-width:860px}
+.page{display:none}.page.active{display:block}
+.pg-title{font-size:21px;font-weight:700;letter-spacing:-.5px;margin-bottom:3px}
+.pg-sub{color:var(--muted);font-size:13px;margin-bottom:22px}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
+.card-hd{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px}
+.stat-v{font-size:26px;font-weight:700;letter-spacing:-1px}
+.stat-l{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.bg{background:#14532d;color:var(--green)}.br{background:#450a0a;color:var(--red)}
+.by{background:#451a03;color:var(--yellow)}.bb{background:#1e3a5f;color:var(--blue)}
+.bm{background:#27272a;color:var(--muted)}
+
+/* TABLE */
+.tw{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse}
+th{background:var(--bg);padding:9px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+
+/* CODE */
+.code{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px 15px;font-family:'Courier New',monospace;font-size:12px;color:#a5f3fc;overflow-x:auto;position:relative;margin:8px 0;line-height:1.6}
+.cpbtn{position:absolute;top:8px;right:8px;background:var(--border);border:none;color:var(--muted);padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer}
+.cpbtn:hover{background:var(--border2);color:var(--text)}
+.token-val{background:var(--bg);border:1px solid var(--green);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:12px;color:var(--green);word-break:break-all;margin:12px 0}
+.env-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'Courier New',monospace;font-size:12px;color:#86efac;line-height:1.8;white-space:pre-wrap;margin:10px 0}
+
+/* MISC */
+.flex{display:flex;align-items:center;gap:8px}
+.fb{display:flex;align-items:center;justify-content:space-between}
+.fr{display:flex;align-items:flex-end;gap:10px;margin-bottom:14px}
+.fr .field{flex:1;margin-bottom:0}
+.mt{margin-top:14px}.mb{margin-bottom:8px}
+.muted{color:var(--muted)}.sm{font-size:12px}
+.empty{text-align:center;padding:36px;color:var(--muted)}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 17px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(70px);opacity:0;transition:.22s;max-width:300px}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.ok{border-color:var(--green);color:var(--green)}
+#toast.err{border-color:var(--red);color:var(--red)}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.dot-green{background:var(--green)}.dot-red{background:var(--red)}.dot-yellow{background:var(--yellow)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="https://ofertatop.com.br/assets/img/ofertatop.png" alt="">
+      <span>lojapi</span>
+    </div>
+    <p class="login-sub">Portal do desenvolvedor — acesso fornecido pela equipe lojapi</p>
+    <div id="login-err" class="err-box"></div>
+    <div class="field">
+      <label>Tipo de acesso</label>
+      <select id="login-type" onchange="toggleSlug()">
+        <option value="store">Loja</option>
+        <option value="admin">Admin global</option>
+      </select>
+    </div>
+    <div class="field" id="slug-field">
+      <label>Slug da loja</label>
+      <input id="login-slug" placeholder="minha-loja">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input id="login-email" type="email" placeholder="email@loja.com">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-primary btn-full" id="btn-login" onclick="doLogin()">Entrar</button>
+    <p class="sm muted" style="margin-top:16px;text-align:center">Não tem acesso? <a href="mailto:suporte@ofertatop.com.br" style="color:var(--accent2)">Solicite à equipe lojapi</a></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="tl">
+      <div class="logo"><img src="https://ofertatop.com.br/assets/img/ofertatop.png" alt="">lojapi</div>
+      <div class="store-pill">Loja: <b id="store-badge">—</b></div>
+      <div class="flex sm" id="api-status-badge">
+        <span class="status-dot dot-yellow"></span><span class="muted">verificando...</span>
+      </div>
+    </div>
+    <div class="tr">
+      <div class="user-chip"><b id="user-name">—</b><span id="user-role">—</span></div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="nav-sec">
+        <div class="nav-lbl">Visão geral</div>
+        <button class="nav-item active" data-page="overview" onclick="goTo(this,'overview')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard
+        </button>
+      </div>
+      <div class="nav-sec">
+        <div class="nav-lbl">Integração</div>
+        <button class="nav-item" data-page="tokens" onclick="goTo(this,'tokens')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Tokens ERP
+        </button>
+        <button class="nav-item" data-page="webhook" onclick="goTo(this,'webhook')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Webhook
+        </button>
+        <button class="nav-item" data-page="env" onclick="goTo(this,'env')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Variáveis .env
+        </button>
+      </div>
+      <div class="nav-sec">
+        <div class="nav-lbl">Dados</div>
+        <button class="nav-item" data-page="products" onclick="goTo(this,'products')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>Produtos
+        </button>
+        <button class="nav-item" data-page="orders" onclick="goTo(this,'orders')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Pedidos
+        </button>
+        <button class="nav-item" data-page="customers" onclick="goTo(this,'customers')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes
+        </button>
+      </div>
+      <div class="nav-sec">
+        <div class="nav-lbl">Links</div>
+        <button class="nav-item" onclick="window.open('/api/v1/docs','_blank')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Swagger
+        </button>
+        <button class="nav-item" onclick="window.open('/status','_blank')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Status API
+        </button>
+      </div>
+    </nav>
+
+    <main class="main">
+
+      <!-- OVERVIEW -->
+      <div id="page-overview" class="page active">
+        <div class="pg-title">Dashboard</div>
+        <div class="pg-sub">Visão geral da sua loja e status da integração</div>
+        <div class="grid2" style="margin-bottom:16px">
+          <div class="stat"><div class="stat-v" id="s-products">—</div><div class="stat-l">Produtos</div></div>
+          <div class="stat"><div class="stat-v" id="s-customers">—</div><div class="stat-l">Clientes</div></div>
+          <div class="stat"><div class="stat-v" id="s-orders">—</div><div class="stat-l">Pedidos</div></div>
+          <div class="stat"><div class="stat-v" id="s-plan" style="font-size:17px;margin-top:4px">—</div><div class="stat-l">Plano</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">🔑 Credenciais da loja</div>
+          <div class="field mb"><label>Store ID</label>
+            <div class="flex"><input id="c-id" readonly style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);flex:1;font-family:'Courier New',monospace;font-size:12px">
+            <button class="btn btn-ghost btn-sm" onclick="cp('c-id')">Copiar</button></div>
+          </div>
+          <div class="field mb"><label>Slug</label>
+            <div class="flex"><input id="c-slug" readonly style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);flex:1;font-family:'Courier New',monospace;font-size:12px">
+            <button class="btn btn-ghost btn-sm" onclick="cp('c-slug')">Copiar</button></div>
+          </div>
+          <div class="field"><label>Base URL</label>
+            <div class="flex"><input id="c-url" value="https://api.ofertatop.com.br/api/v1" readonly style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);flex:1;font-family:'Courier New',monospace;font-size:12px">
+            <button class="btn btn-ghost btn-sm" onclick="cp('c-url')">Copiar</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd">📋 Próximos passos</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</span><span>Gere um <b>Token ERP</b> na aba Tokens ERP</span></div>
+            <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span><span>Copie o bloco <b>.env</b> na aba Variáveis .env</span></div>
+            <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">3</span><span>Configure a <b>URL do webhook</b> na aba Webhook</span></div>
+            <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">4</span><span>Use o token no header <code style="color:var(--accent2)">X-API-Key</code> do seu ERP</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOKENS -->
+      <div id="page-tokens" class="page">
+        <div class="pg-title">Tokens ERP</div>
+        <div class="pg-sub">Gere tokens de integração para autenticar seu ERP na API</div>
+        <div class="card">
+          <div class="card-hd">➕ Gerar novo token</div>
+          <div class="fr">
+            <div class="field"><label>Nome do token</label><input id="tk-name" placeholder="Ex: ERP Principal"></div>
+            <div class="field" style="max-width:150px"><label>Expira em (dias)</label><input id="tk-days" type="number" value="365"></div>
+            <button class="btn btn-primary" onclick="genToken()">Gerar token</button>
+          </div>
+          <div id="tk-result" style="display:none">
+            <div class="sm muted mb">✓ Token gerado — copie agora, não será exibido novamente</div>
+            <div class="token-val" id="tk-val"></div>
+            <div class="flex">
+              <button class="btn btn-ghost btn-sm" onclick="cpText(document.getElementById('tk-val').textContent)">📋 Copiar token</button>
+              <span class="sm muted" id="tk-expires"></span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="fb mb">
+            <div class="card-hd" style="margin-bottom:0">Tokens ativos</div>
+            <button class="btn btn-ghost btn-sm" onclick="loadTokens()">↻ Atualizar</button>
+          </div>
+          <div class="tw">
+            <table><thead><tr><th>Nome</th><th>Token</th><th>Criado</th><th>Expira</th><th>Último uso</th><th></th></tr></thead>
+            <tbody id="tokens-tb"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEBHOOK -->
+      <div id="page-webhook" class="page">
+        <div class="pg-title">Webhook</div>
+        <div class="pg-sub">Configure a URL do seu ERP para receber eventos em tempo real</div>
+        <div class="card">
+          <div class="card-hd">⚙ URL do webhook</div>
+          <div class="fr">
+            <div class="field"><label>URL do endpoint no seu ERP</label><input id="wh-url" type="url" placeholder="https://seu-erp.com/api/webhook/lojapi"></div>
+            <button class="btn btn-primary" onclick="saveWh()">Salvar</button>
+            <button class="btn btn-ghost" onclick="testWh()">Testar</button>
+          </div>
+          <div id="wh-current" class="sm muted"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">📡 Eventos disponíveis</div>
+          <div id="events-grid" class="grid2"></div>
+        </div>
+        <div class="card">
+          <div class="fb mb">
+            <div class="card-hd" style="margin-bottom:0">Logs recentes</div>
+            <button class="btn btn-ghost btn-sm" onclick="loadLogs()">↻ Atualizar</button>
+          </div>
+          <div class="tw">
+            <table><thead><tr><th>Evento</th><th>Status HTTP</th><th>Resposta</th><th>Data</th></tr></thead>
+            <tbody id="logs-tb"><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENV -->
+      <div id="page-env" class="page">
+        <div class="pg-title">Variáveis de Ambiente</div>
+        <div class="pg-sub">Copie e cole no <code style="color:var(--accent2)">.env</code> do seu ERP</div>
+        <div class="card">
+          <div class="fb mb">
+            <div class="card-hd" style="margin-bottom:0">Bloco .env</div>
+            <button class="btn btn-primary btn-sm" onclick="cpText(document.getElementById('env-block').textContent.trim())">📋 Copiar tudo</button>
+          </div>
+          <div class="env-block" id="env-block">Gere um token primeiro para ver as variáveis.</div>
+        </div>
+        <div class="card">
+          <div class="card-hd">Exemplos de uso no ERP</div>
+          <div class="sm muted mb">Node.js / TypeScript</div>
+          <div class="code" id="ex-node"><button class="cpbtn" onclick="cpBlock('ex-node')">copiar</button></div>
+          <div class="sm muted mt mb">PHP (Guzzle)</div>
+          <div class="code" id="ex-php"><button class="cpbtn" onclick="cpBlock('ex-php')">copiar</button></div>
+          <div class="sm muted mt mb">cURL</div>
+          <div class="code" id="ex-curl"><button class="cpbtn" onclick="cpBlock('ex-curl')">copiar</button></div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="page-products" class="page">
+        <div class="pg-title">Produtos</div>
+        <div class="pg-sub">Consulte o catálogo — gerencie pelo seu ERP via API</div>
+        <div class="card">
+          <div class="fb mb">
+            <input id="prod-q" placeholder="Buscar nome ou SKU..." style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);width:240px" oninput="loadProds()">
+            <button class="btn btn-ghost btn-sm" onclick="loadProds()">↻ Atualizar</button>
+          </div>
+          <div class="tw">
+            <table><thead><tr><th>Nome</th><th>SKU</th><th>Preço</th><th>Estoque</th><th>Status</th></tr></thead>
+            <tbody id="prods-tb"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table>
+          </div>
+          <div id="prods-pg" class="flex mt" style="justify-content:flex-end;gap:8px"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">⚡ Atualizar estoque rápido</div>
+          <div class="fr">
+            <div class="field"><label>ID do produto</label><input id="sk-id" placeholder="uuid"></div>
+            <div class="field" style="max-width:110px"><label>Quantidade</label><input id="sk-qty" type="number" value="1"></div>
+            <div class="field" style="max-width:140px"><label>Operação</label>
+              <select id="sk-op"><option value="increment">Adicionar</option><option value="decrement">Subtrair</option><option value="set">Definir</option></select>
+            </div>
+            <button class="btn btn-primary" onclick="updStock()">Atualizar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div id="page-orders" class="page">
+        <div class="pg-title">Pedidos</div>
+        <div class="pg-sub">Consulte e atualize status — pedidos chegam via webhook</div>
+        <div class="card">
+          <div class="flex mb" style="flex-wrap:wrap;gap:8px">
+            <select id="ord-st" onchange="loadOrds()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text)">
+              <option value="">Todos os status</option>
+              <option>PENDING</option><option>CONFIRMED</option><option>PROCESSING</option>
+              <option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option>
+            </select>
+            <select id="ord-pay" onchange="loadOrds()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text)">
+              <option value="">Todos os pagamentos</option>
+              <option>PENDING</option><option>PAID</option><option>FAILED</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="loadOrds()">↻ Atualizar</button>
+          </div>
+          <div class="tw">
+            <table><thead><tr><th>Nº</th><th>Cliente</th><th>Total</th><th>Status</th><th>Pagamento</th><th>Data</th><th>Ação</th></tr></thead>
+            <tbody id="ords-tb"><tr><td colspan="7" class="empty">Carregando...</td></tr></tbody></table>
+          </div>
+          <div id="ords-pg" class="flex mt" style="justify-content:flex-end;gap:8px"></div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS -->
+      <div id="page-customers" class="page">
+        <div class="pg-title">Clientes</div>
+        <div class="pg-sub">Base de clientes da loja</div>
+        <div class="card">
+          <div class="fb mb">
+            <input id="cust-q" placeholder="Buscar nome, email ou documento..." style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);width:300px" oninput="loadCusts()">
+            <button class="btn btn-ghost btn-sm" onclick="loadCusts()">↻ Atualizar</button>
+          </div>
+          <div class="tw">
+            <table><thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Pedidos</th><th>Status</th></tr></thead>
+            <tbody id="custs-tb"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const BASE='/api/v1';
+let S={token:null,apiKey:null,storeId:null,slug:null,name:null};
+let prodPage=1,ordPage=1;
+
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function toast(m,t='ok'){const el=document.getElementById('toast');el.textContent=m;el.className='show '+t;setTimeout(()=>el.className='',3000)}
+function cp(id){const el=document.getElementById(id);el.select();document.execCommand('copy');toast('Copiado!')}
+function cpText(t){navigator.clipboard.writeText(t).then(()=>toast('Copiado!'))}
+function cpBlock(id){const el=document.getElementById(id);const t=[...el.childNodes].filter(n=>n.nodeType===3||n.tagName!=='BUTTON').map(n=>n.textContent).join('');cpText(t.trim())}
+function dt(d){if(!d)return'—';return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function money(v){return'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2})}
+function badge(s){const m={PENDING:'by',CONFIRMED:'bb',PROCESSING:'bb',SHIPPED:'bb',DELIVERED:'bg',CANCELLED:'br',REFUNDED:'bm',PAID:'bg',FAILED:'br'};return`<span class="badge ${m[s]||'bm'}">${s}</span>`}
+
+async function req(method,path,body){
+  const h={'Content-Type':'application/json'};
+  if(S.apiKey)h['X-API-Key']=S.apiKey;
+  else if(S.token)h['Authorization']='Bearer '+S.token;
+  const r=await fetch(BASE+path,{method,headers:h,body:body?JSON.stringify(body):undefined});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||'Erro '+r.status);
+  return d;
+}
+
+// ── AUTH ───────────────────────────────────────────────────────────────────
+function toggleSlug(){document.getElementById('slug-field').style.display=document.getElementById('login-type').value==='admin'?'none':'block'}
+function showErr(m){const e=document.getElementById('login-err');e.textContent=m;e.style.display='block'}
+
+async function doLogin(){
+  const type=document.getElementById('login-type').value;
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const slug=document.getElementById('login-slug').value.trim();
+  if(!email||!pass){showErr('Preencha email e senha');return}
+  const btn=document.getElementById('btn-login');
+  btn.innerHTML='<span class="spin"></span> Entrando...';btn.disabled=true;
+  try{
+    if(type==='admin'){
+      const d=await fetch(BASE+'/auth/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})}).then(r=>r.json());
+      if(d.error)throw new Error(d.error);
+      S.token=d.token;S.name=d.user.name;S.role=d.user.role;S.name=d.user.name;S.storeName='Admin Global';
+    } else {
+      if(!slug){showErr('Informe o slug da loja');btn.textContent='Entrar';btn.disabled=false;return}
+      const d=await fetch(BASE+'/auth/loja/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,storeSlug:slug})}).then(r=>r.json());
+      if(d.error)throw new Error(d.error);
+      S.token=d.token;S.name=d.user.name;S.role=d.user.role;S.storeId=d.store.id;S.slug=d.store.slug;S.storeName=d.store.name;
+      const loja=await fetch(BASE+'/loja',{headers:{'Authorization':'Bearer '+d.token}}).then(r=>r.json());
+      S.apiKey=loja.apiKey;S.storeId=loja.id;
+    }
+    startApp();
+  }catch(e){showErr(e.message)}
+  btn.innerHTML='Entrar';btn.disabled=false;
+}
+
+function startApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('store-badge').textContent=S.storeName||'—';
+  document.getElementById('user-name').textContent=S.name||'—';
+  document.getElementById('user-role').textContent=S.role||'—';
+  checkApiStatus();loadOverview();loadTokens();loadWh();loadEnv();loadEvents();
+}
+
+function logout(){S={};document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex'}
+
+// ── NAV ────────────────────────────────────────────────────────────────────
+function goTo(btn,page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  btn.classList.add('active');
+  const fn={products:loadProds,orders:loadOrds,customers:loadCusts};
+  if(fn[page])fn[page]();
+}
+
+// ── API STATUS ─────────────────────────────────────────────────────────────
+async function checkApiStatus(){
+  const el=document.getElementById('api-status-badge');
+  try{
+    const r=await fetch('/status');const d=await r.json();
+    el.innerHTML=`<span class="status-dot dot-green"></span><span class="sm muted">API online</span>`;
+  }catch{el.innerHTML=`<span class="status-dot dot-red"></span><span class="sm muted">API offline</span>`}
+}
+
+// ── OVERVIEW ───────────────────────────────────────────────────────────────
+async function loadOverview(){
+  try{
+    const d=await req('GET','/loja');
+    document.getElementById('s-products').textContent=d._count?.products??'—';
+    document.getElementById('s-customers').textContent=d._count?.customers??'—';
+    document.getElementById('s-orders').textContent=d._count?.orders??'—';
+    document.getElementById('s-plan').textContent=d.plan||'—';
+    document.getElementById('c-id').value=d.id||'';
+    document.getElementById('c-slug').value=d.slug||'';
+  }catch(e){toast(e.message,'err')}
+}
+
+// ── TOKENS ─────────────────────────────────────────────────────────────────
+async function loadTokens(){
+  try{
+    const d=await req('GET','/tokens');
+    const tb=document.getElementById('tokens-tb');
+    if(!d.length){tb.innerHTML='<tr><td colspan="6" class="empty">Nenhum token gerado ainda</td></tr>';return}
+    tb.innerHTML=d.map(t=>`<tr>
+      <td><b>${t.name}</b></td>
+      <td><code style="font-size:11px;color:var(--accent2)">${t.token}</code></td>
+      <td class="muted sm">${dt(t.createdAt)}</td>
+      <td>${t.expiresAt?dt(t.expiresAt):'<span class="badge bm">Nunca</span>'}</td>
+      <td>${t.lastUsedAt?dt(t.lastUsedAt):'<span class="muted">—</span>'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="revokeToken('${t.id}')">Revogar</button></td>
+    </tr>`).join('');
+  }catch(e){toast(e.message,'err')}
+}
+
+async function genToken(){
+  const name=document.getElementById('tk-name').value.trim()||'Token ERP';
+  const days=parseInt(document.getElementById('tk-days').value)||365;
+  try{
+    const d=await req('POST','/tokens',{name,expiresInDays:days});
+    document.getElementById('tk-val').textContent=d.integration.token;
+    document.getElementById('tk-expires').textContent=d.integration.expiresAt?'Expira em: '+dt(d.integration.expiresAt):'Sem expiração';
+    document.getElementById('tk-result').style.display='block';
+    toast('Token gerado!');loadTokens();loadEnv();
+  }catch(e){toast(e.message,'err')}
+}
+
+async function revokeToken(id){
+  if(!confirm('Revogar este token? O ERP que usa ele vai parar de funcionar.'))return;
+  try{await req('DELETE',`/tokens/${id}/revogar`);toast('Token revogado');loadTokens()}
+  catch(e){toast(e.message,'err')}
+}
+
+// ── WEBHOOK ────────────────────────────────────────────────────────────────
+async function loadWh(){
+  try{
+    const d=await req('GET','/loja');
+    if(d.webhookUrl){document.getElementById('wh-url').value=d.webhookUrl;document.getElementById('wh-current').textContent='URL atual: '+d.webhookUrl}
+  }catch{}
+  loadLogs();
+}
+
+async function saveWh(){
+  const url=document.getElementById('wh-url').value.trim();
+  if(!url){toast('Informe a URL','err');return}
+  try{await req('POST','/webhook/configurar',{webhookUrl:url});document.getElementById('wh-current').textContent='URL atual: '+url;toast('Webhook salvo!')}
+  catch(e){toast(e.message,'err')}
+}
+
+async function testWh(){
+  try{const r=await req('POST','/webhook/testar');toast(r.message||'Evento de teste enviado!')}
+  catch(e){toast(e.message,'err')}
+}
+
+async function loadEvents(){
+  try{
+    const d=await req('GET','/webhook/eventos');
+    document.getElementById('events-grid').innerHTML=d.map(e=>`
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 13px">
+        <code style="color:var(--accent2);font-size:12px">${e.event}</code>
+        <div class="sm muted" style="margin-top:3px">${e.description}</div>
+      </div>`).join('');
+  }catch{}
+}
+
+async function loadLogs(){
+  try{
+    const d=await req('GET','/webhook/logs?limit=15');
+    const tb=document.getElementById('logs-tb');
+    if(!d.data?.length){tb.innerHTML='<tr><td colspan="4" class="empty">Nenhum log ainda</td></tr>';return}
+    tb.innerHTML=d.data.map(l=>`<tr>
+      <td><code style="font-size:11px;color:var(--accent2)">${l.event}</code></td>
+      <td>${l.status>=200&&l.status<300?`<span class="badge bg">${l.status}</span>`:`<span class="badge br">${l.status||'—'}</span>`}</td>
+      <td class="muted sm">${l.response||'—'}</td>
+      <td class="muted sm">${dt(l.createdAt)}</td>
+    </tr>`).join('');
+  }catch(e){toast(e.message,'err')}
+}
+
+// ── ENV ────────────────────────────────────────────────────────────────────
+async function loadEnv(){
+  try{
+    const d=await req('GET','/tokens/env');
+    document.getElementById('env-block').textContent=d.dotenv_format;
+    document.getElementById('ex-node').innerHTML=`<button class="cpbtn" onclick="cpBlock('ex-node')">copiar</button>${d.examples.node}`;
+    document.getElementById('ex-php').innerHTML=`<button class="cpbtn" onclick="cpBlock('ex-php')">copiar</button>${d.examples.php}`;
+    document.getElementById('ex-curl').innerHTML=`<button class="cpbtn" onclick="cpBlock('ex-curl')">copiar</button>${d.examples.curl}`;
+  }catch{}
+}
+
+// ── PRODUCTS ───────────────────────────────────────────────────────────────
+async function loadProds(){
+  const q=document.getElementById('prod-q').value;
+  try{
+    const d=await req('GET',`/produtos?page=${prodPage}&limit=20${q?'&search='+encodeURIComponent(q):''}`);
+    const tb=document.getElementById('prods-tb');
+    if(!d.data?.length){tb.innerHTML='<tr><td colspan="5" class="empty">Nenhum produto</td></tr>';return}
+    tb.innerHTML=d.data.map(p=>`<tr>
+      <td><b>${p.name}</b>${p.featured?' <span class="badge by">destaque</span>':''}</td>
+      <td class="muted sm">${p.sku||'—'}</td>
+      <td>${money(p.price)}</td>
+      <td style="color:${p.stock>10?'var(--green)':p.stock>0?'var(--yellow)':'var(--red)'}">${p.stock}</td>
+      <td>${p.active?'<span class="badge bg">ativo</span>':'<span class="badge br">inativo</span>'}</td>
+    </tr>`).join('');
+    const pg=d.pagination;
+    const el=document.getElementById('prods-pg');
+    el.innerHTML=`<span class="sm muted">${pg.total} produtos</span>`;
+    if(pg.page>1)el.innerHTML+=`<button class="btn btn-ghost btn-sm" onclick="prodPage--;loadProds()">← Anterior</button>`;
+    if(pg.page<pg.totalPages)el.innerHTML+=`<button class="btn btn-ghost btn-sm" onclick="prodPage++;loadProds()">Próxima →</button>`;
+  }catch(e){toast(e.message,'err')}
+}
+
+async function updStock(){
+  const id=document.getElementById('sk-id').value.trim();
+  const qty=parseInt(document.getElementById('sk-qty').value);
+  const op=document.getElementById('sk-op').value;
+  if(!id||isNaN(qty)){toast('Preencha ID e quantidade','err');return}
+  try{const r=await req('PATCH',`/produtos/${id}/estoque`,{quantity:qty,operation:op});toast(`Estoque: ${r.stock}`);loadProds()}
+  catch(e){toast(e.message,'err')}
+}
+
+// ── ORDERS ─────────────────────────────────────────────────────────────────
+async function loadOrds(){
+  const st=document.getElementById('ord-st').value;
+  const pay=document.getElementById('ord-pay').value;
+  try{
+    const d=await req('GET',`/pedidos?page=${ordPage}&limit=20${st?'&status='+st:''}${pay?'&paymentStatus='+pay:''}`);
+    const tb=document.getElementById('ords-tb');
+    if(!d.data?.length){tb.innerHTML='<tr><td colspan="7" class="empty">Nenhum pedido</td></tr>';return}
+    tb.innerHTML=d.data.map(o=>`<tr>
+      <td><b>${o.orderNumber}</b></td>
+      <td class="muted sm">${o.customer?.name||'—'}</td>
+      <td>${money(o.total)}</td>
+      <td>${badge(o.status)}</td>
+      <td>${badge(o.paymentStatus)}</td>
+      <td class="muted sm">${dt(o.createdAt)}</td>
+      <td>
+        <select onchange="updOrdStatus('${o.id}',this.value)" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:11px">
+          <option value="">Alterar...</option>
+          ${['CONFIRMED','PROCESSING','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option>${s}</option>`).join('')}
+        </select>
+      </td>
+    </tr>`).join('');
+    const pg=d.pagination;
+    const el=document.getElementById('ords-pg');
+    el.innerHTML=`<span class="sm muted">${pg.total} pedidos</span>`;
+    if(pg.page>1)el.innerHTML+=`<button class="btn btn-ghost btn-sm" onclick="ordPage--;loadOrds()">← Anterior</button>`;
+    if(pg.page<pg.totalPages)el.innerHTML+=`<button class="btn btn-ghost btn-sm" onclick="ordPage++;loadOrds()">Próxima →</button>`;
+  }catch(e){toast(e.message,'err')}
+}
+
+async function updOrdStatus(id,status){
+  if(!status)return;
+  try{await req('PATCH',`/pedidos/${id}/status`,{status});toast('Status: '+status);loadOrds()}
+  catch(e){toast(e.message,'err')}
+}
+
+// ── CUSTOMERS ──────────────────────────────────────────────────────────────
+async function loadCusts(){
+  const q=document.getElementById('cust-q').value;
+  try{
+    const d=await req('GET',`/clientes?limit=30${q?'&search='+encodeURIComponent(q):''}`);
+    const tb=document.getElementById('custs-tb');
+    if(!d.data?.length){tb.innerHTML='<tr><td colspan="5" class="empty">Nenhum cliente</td></tr>';return}
+    tb.innerHTML=d.data.map(c=>`<tr>
+      <td><b>${c.name}</b></td>
+      <td class="muted sm">${c.email}</td>
+      <td class="muted sm">${c.phone||'—'}</td>
+      <td>${c._count?.orders??0}</td>
+      <td>${c.active?'<span class="badge bg">ativo</span>':'<span class="badge br">inativo</span>'}</td>
+    </tr>`).join('');
+  }catch(e){toast(e.message,'err')}
+}
+</script>
+</body>
+</html>

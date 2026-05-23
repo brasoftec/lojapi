@@ -33,6 +33,8 @@ RUN apk add --no-cache openssl
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+# Copia o portal estático para dentro do dist
+COPY src/public ./dist/public
 # Substitui schema e migrations pelo de produção (PostgreSQL)
 RUN cp prisma/schema.prod.prisma prisma/schema.prisma && \
     rm -rf prisma/migrations && \

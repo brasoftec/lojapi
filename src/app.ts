@@ -51,6 +51,11 @@ app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   },
 }));
 
+// ─── Developer Portal ─────────────────────────────────────────────────────────
+app.get('/dev', (_req, res) => {
+  res.sendFile('public/dev.html', { root: __dirname });
+});
+
 // ─── Rotas ────────────────────────────────────────────────────────────────────
 app.use('/api/v1', routes);
 
