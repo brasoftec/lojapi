@@ -3,10 +3,14 @@ main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Domínio customizado
-routes = [
-  { pattern = "api.ofertatop.com.br/*", custom_domain = true }
-]
+# Domínio customizado — configure após adicionar ofertatop.com.br ao Cloudflare
+# Passo 1: Adicione o domínio em https://dash.cloudflare.com → Add a Site
+# Passo 2: Aponte os nameservers do domínio para o Cloudflare
+# Passo 3: Descomente as linhas abaixo e rode: npx wrangler deploy
+#
+# [[routes]]
+# pattern = "api.ofertatop.com.br/*"
+# zone_name = "ofertatop.com.br"
 
 # Variáveis de ambiente (valores sensíveis ficam em secrets)
 [vars]

@@ -33,8 +33,10 @@ RUN apk add --no-cache openssl
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-# Garante que o schema de produção está ativo no container
-RUN cp prisma/schema.prod.prisma prisma/schema.prisma
+# Substitui schema e migrations pelo de produção (PostgreSQL)
+RUN cp prisma/schema.prod.prisma prisma/schema.prisma && \
+    rm -rf prisma/migrations && \
+    mv prisma/migrations-prod prisma/migrations
 COPY package.json ./
 
 # Cria diretório de uploads
