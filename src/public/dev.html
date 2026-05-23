@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>lojapi — Developer Portal</title>
-<link rel="icon" href="https://ofertatop.com.br/assets/img/ofertatop.png">
+<link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="https://font.brasoftec.com.br/fonts/instrument-sans/instrument-sans.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -116,18 +116,10 @@ tr:hover td{background:rgba(255,255,255,.015)}
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <img src="https://ofertatop.com.br/assets/img/ofertatop.png" alt="">
+      <img src="/favicon.png" alt="">
       <span>lojapi</span>
     </div>
-    <p class="login-sub">Portal do desenvolvedor — acesso fornecido pela equipe lojapi</p>
     <div id="login-err" class="err-box"></div>
-    <div class="field">
-      <label>Tipo de acesso</label>
-      <select id="login-type" onchange="toggleSlug()">
-        <option value="store">Loja</option>
-        <option value="admin">Admin global</option>
-      </select>
-    </div>
     <div class="field" id="slug-field">
       <label>Slug da loja</label>
       <input id="login-slug" placeholder="minha-loja">
@@ -149,7 +141,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 <div id="app">
   <div class="topbar">
     <div class="tl">
-      <div class="logo"><img src="https://ofertatop.com.br/assets/img/ofertatop.png" alt="">lojapi</div>
+      <div class="logo"><img src="/favicon.png" alt="">lojapi</div>
       <div class="store-pill">Loja: <b id="store-badge">—</b></div>
       <div class="flex sm" id="api-status-badge">
         <span class="status-dot dot-yellow"></span><span class="muted">verificando...</span>
@@ -424,30 +416,23 @@ async function req(method,path,body){
 }
 
 // ── AUTH ───────────────────────────────────────────────────────────────────
-function toggleSlug(){document.getElementById('slug-field').style.display=document.getElementById('login-type').value==='admin'?'none':'block'}
 function showErr(m){const e=document.getElementById('login-err');e.textContent=m;e.style.display='block'}
 
 async function doLogin(){
-  const type=document.getElementById('login-type').value;
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
   const slug=document.getElementById('login-slug').value.trim();
   if(!email||!pass){showErr('Preencha email e senha');return}
+  if(!slug){showErr('Informe o slug da loja');return}
   const btn=document.getElementById('btn-login');
   btn.innerHTML='<span class="spin"></span> Entrando...';btn.disabled=true;
   try{
-    if(type==='admin'){
-      const d=await fetch(BASE+'/auth/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})}).then(r=>r.json());
-      if(d.error)throw new Error(d.error);
-      S.token=d.token;S.name=d.user.name;S.role=d.user.role;S.name=d.user.name;S.storeName='Admin Global';
-    } else {
-      if(!slug){showErr('Informe o slug da loja');btn.textContent='Entrar';btn.disabled=false;return}
-      const d=await fetch(BASE+'/auth/loja/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,storeSlug:slug})}).then(r=>r.json());
-      if(d.error)throw new Error(d.error);
-      S.token=d.token;S.name=d.user.name;S.role=d.user.role;S.storeId=d.store.id;S.slug=d.store.slug;S.storeName=d.store.name;
-      const loja=await fetch(BASE+'/loja',{headers:{'Authorization':'Bearer '+d.token}}).then(r=>r.json());
-      S.apiKey=loja.apiKey;S.storeId=loja.id;
-    }
+    const d=await fetch(BASE+'/auth/loja/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,storeSlug:slug})}).then(r=>r.json());
+    if(d.error)throw new Error(d.error);
+    S.token=d.token;S.name=d.user.name;S.role=d.user.role;
+    S.storeId=d.store.id;S.slug=d.store.slug;S.storeName=d.store.name;
+    const loja=await fetch(BASE+'/loja',{headers:{'Authorization':'Bearer '+d.token}}).then(r=>r.json());
+    S.apiKey=loja.apiKey;S.storeId=loja.id;
     startApp();
   }catch(e){showErr(e.message)}
   btn.innerHTML='Entrar';btn.disabled=false;

@@ -55,6 +55,9 @@ app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 app.get('/dev', (_req, res) => {
   res.sendFile('public/dev.html', { root: __dirname });
 });
+app.get('/favicon.png', (_req, res) => {
+  res.sendFile('public/favicon.png', { root: __dirname });
+});
 
 // ─── Rotas ────────────────────────────────────────────────────────────────────
 app.use('/api/v1', routes);
