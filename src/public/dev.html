@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -253,16 +253,24 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="login-err" class="err-box"></div>
     <div class="field">
       <label>Email</label>
-      <input id="login-email" type="email" placeholder="email@loja.com">
+      <input id="login-email" type="email" placeholder="email@loja.com" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="field">
       <label>Senha</label>
       <div class="pass-wrap">
         <input id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-        <button class="eye-btn" type="button" onclick="togglePass()" tabindex="-1">
-          <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 15 15"><path d="M0 0h15v15H0z" fill="none"/><path fill="currentColor" d="M7.5 9C5.186 9 3.561 7.848 2.497 6.666a9.4 9.4 0 0 1-1.449-2.164l-.08-.18l-.004-.007v-.001L.5 4.5l-.464.186v.002l.003.004l.026.063l.078.173a10.4 10.4 0 0 0 1.61 2.406C2.94 8.652 4.814 10 7.5 10zm7-4.5l-.464-.186l-.003.008l-.015.035l-.066.145a9.4 9.4 0 0 1-1.449 2.164C11.44 7.848 9.814 9 7.5 9v1c2.686 0 4.561-1.348 5.747-2.666a10.4 10.4 0 0 0 1.61-2.406a6 6 0 0 0 .104-.236l.002-.004v-.001h.001zM8 12V9.5H7V12zm-6.646-1.646l2-2l-.708-.708l-2 2zm10.292-2l2 2l.708-.708l-2-2z"/></svg>
+        <button class="eye-btn" type="button" onclick="togglePass()" tabindex="-1" id="eye-btn">
+          <!-- ícone olho ABERTO — estado inicial (senha oculta, clica pra ver) -->
+          <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
         </button>
       </div>
+    </div>
+    <div class="field" id="slug-field" style="display:none">
+      <label>Slug da loja</label>
+      <input id="login-slug" placeholder="minha-loja" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <button class="btn-login-main" id="btn-login" onclick="doLogin()">
       ENTRAR
@@ -553,64 +561,62 @@ async function req(method,path,body){
 function togglePass(){
   const inp=document.getElementById('login-pass');
   const icon=document.getElementById('eye-icon');
-  if(inp.type==='password'){
-    inp.type='text';
-    // olho aberto
+  const showing=inp.type==='text';
+  inp.type=showing?'password':'text';
+  if(showing){
+    // voltou a ocultar → olho ABERTO
     icon.setAttribute('viewBox','0 0 24 24');
-    icon.setAttribute('fill','none');
     icon.setAttribute('stroke','currentColor');
     icon.setAttribute('stroke-width','2');
+    icon.setAttribute('fill','none');
     icon.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
   } else {
-    inp.type='password';
-    // olho fechado (ícone fornecido)
-    icon.setAttribute('viewBox','0 0 15 15');
+    // mostrando senha → olho FECHADO (riscado)
+    icon.setAttribute('viewBox','0 0 24 24');
+    icon.setAttribute('stroke','currentColor');
+    icon.setAttribute('stroke-width','2');
     icon.setAttribute('fill','none');
-    icon.removeAttribute('stroke');
-    icon.removeAttribute('stroke-width');
-    icon.innerHTML='<path d="M0 0h15v15H0z" fill="none"/><path fill="currentColor" d="M7.5 9C5.186 9 3.561 7.848 2.497 6.666a9.4 9.4 0 0 1-1.449-2.164l-.08-.18l-.004-.007v-.001L.5 4.5l-.464.186v.002l.003.004l.026.063l.078.173a10.4 10.4 0 0 0 1.61 2.406C2.94 8.652 4.814 10 7.5 10zm7-4.5l-.464-.186l-.003.008l-.015.035l-.066.145a9.4 9.4 0 0 1-1.449 2.164C11.44 7.848 9.814 9 7.5 9v1c2.686 0 4.561-1.348 5.747-2.666a10.4 10.4 0 0 0 1.61-2.406a6 6 0 0 0 .104-.236l.002-.004v-.001h.001zM8 12V9.5H7V12zm-6.646-1.646l2-2l-.708-.708l-2 2zm10.292-2l2 2l.708-.708l-2-2z"/>';
+    icon.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
   }
 }
 function showErr(m){const e=document.getElementById('login-err');e.textContent=m;e.style.display='block'}
 
+const BTN_DEFAULT='ENTRAR <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>';
+const BTN_LOADING='<span class="btn-spinner"></span>';
+
 async function doLogin(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
+  const slugEl=document.getElementById('login-slug');
+  const slug=slugEl?slugEl.value.trim():'';
+  document.getElementById('login-err').style.display='none';
   if(!email||!pass){showErr('Preencha email e senha');return}
   const btn=document.getElementById('btn-login');
-  btn.innerHTML='<span class="btn-spinner"></span>';btn.disabled=true;
+  btn.innerHTML=BTN_LOADING;btn.disabled=true;
   try{
-    // Tenta login admin primeiro
+    const saved=localStorage.getItem('lojapi_slug')||'';
+    const derived=email.split('@')[0].replace(/[^a-z0-9]/gi,'-').toLowerCase();
+    const trySlug=slug||saved||derived;
+    const lojaRes=await fetch(BASE+'/auth/loja/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,storeSlug:trySlug})}).then(r=>r.json());
+    if(!lojaRes.error){
+      localStorage.setItem('lojapi_slug',lojaRes.store.slug);
+      S.token=lojaRes.token;S.name=lojaRes.user.name;S.role=lojaRes.user.role;
+      S.storeId=lojaRes.store.id;S.slug=lojaRes.store.slug;S.storeName=lojaRes.store.name;
+      const loja=await fetch(BASE+'/loja',{headers:{'Authorization':'Bearer '+S.token}}).then(r=>r.json());
+      S.apiKey=loja.apiKey;S.storeId=loja.id;
+      btn.innerHTML=BTN_DEFAULT;btn.disabled=false;startApp();return;
+    }
     const adminRes=await fetch(BASE+'/auth/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})}).then(r=>r.json());
     if(!adminRes.error){
-      S.token=adminRes.token;S.name=adminRes.user.name;S.role=adminRes.user.role;S.storeName='Admin Global';
-      startApp();btn.innerHTML='Entrar';btn.disabled=false;return;
+      S.token=adminRes.token;S.name=adminRes.user.name;S.role=adminRes.user.role;S.storeName='Admin';
+      btn.innerHTML=BTN_DEFAULT;btn.disabled=false;startApp();return;
     }
-    // Tenta login de loja — slug salvo do último login ou derivado do email
-    const savedSlug=localStorage.getItem('lojapi_slug')||'';
-    const slugGuess=savedSlug||email.split('@')[0].replace(/[^a-z0-9]/gi,'-').toLowerCase();
-    const d=await fetch(BASE+'/auth/loja/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,storeSlug:slugGuess})}).then(r=>r.json());
-    if(d.error){
-      // Se falhou com o slug derivado, pede o slug
-      const slug=prompt('Informe o slug da sua loja (ex: minha-loja):','');
-      if(!slug){btn.innerHTML='Entrar';btn.disabled=false;return}
-      const d2=await fetch(BASE+'/auth/loja/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,storeSlug:slug})}).then(r=>r.json());
-      if(d2.error)throw new Error(d2.error);
-      localStorage.setItem('lojapi_slug',slug);
-      S.token=d2.token;S.name=d2.user.name;S.role=d2.user.role;
-      S.storeId=d2.store.id;S.slug=d2.store.slug;S.storeName=d2.store.name;
-    } else {
-      localStorage.setItem('lojapi_slug',d.store.slug);
-      S.token=d.token;S.name=d.user.name;S.role=d.user.role;
-      S.storeId=d.store.id;S.slug=d.store.slug;S.storeName=d.store.name;
-    }
-    const loja=await fetch(BASE+'/loja',{headers:{'Authorization':'Bearer '+S.token}}).then(r=>r.json());
-    S.apiKey=loja.apiKey;S.storeId=loja.id;
-    startApp();
+    document.getElementById('slug-field').style.display='block';
+    document.getElementById('login-slug').focus();
+    showErr('Informe o slug da sua loja no campo abaixo e tente novamente.');
   }catch(e){showErr(e.message)}
-  btn.innerHTML='ENTRAR <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>';btn.disabled=false;
+  btn.innerHTML=BTN_DEFAULT;btn.disabled=false;
 }
-
 function startApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='flex';
