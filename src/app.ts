@@ -36,9 +36,19 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // ─── Docs ─────────────────────────────────────────────────────────────────────
+// JSON do spec deve ser registrado ANTES do swaggerUi.serve
+app.get('/api/v1/docs/swagger.json', (_req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Store API - Documentação',
+  customSiteTitle: 'lojapi — Documentação',
+  swaggerOptions: {
+    persistAuthorization: true,
+    defaultModelsExpandDepth: -1,
+  },
 }));
 
 // ─── Rotas ────────────────────────────────────────────────────────────────────

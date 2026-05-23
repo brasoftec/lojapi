@@ -4,6 +4,10 @@ API REST multi-loja para integração com ERPs e painéis administrativos.
 
 **Stack:** Node.js · Express · TypeScript · Prisma · PostgreSQL · JWT · Swagger · Docker
 
+**Produção:** https://api.ofertatop.com.br
+**Swagger:** https://api.ofertatop.com.br/api/v1/docs
+**Repositório:** https://github.com/brasoftec/lojapi
+
 ---
 
 ## Início Rápido
@@ -11,38 +15,30 @@ API REST multi-loja para integração com ERPs e painéis administrativos.
 ### Com Docker (recomendado)
 
 ```bash
-# 1. Clone o repositório
 git clone https://github.com/brasoftec/lojapi.git
 cd lojapi
 
-# 2. Configure as variáveis de ambiente
 cp .env.docker .env
-# Edite o .env se necessário (JWT_SECRET em produção!)
+# Edite JWT_SECRET em produção!
 
-# 3. Suba os containers
 docker-compose up -d
-
-# 4. Rode o seed (dados iniciais)
-docker exec lojapi npx prisma db seed
+docker exec lojapi node dist/seed.js
 ```
-
-Serviços disponíveis:
 
 | Serviço | URL |
 |---------|-----|
 | API | http://localhost:3001 |
-| Swagger Docs | http://localhost:3001/api/v1/docs |
+| Swagger | http://localhost:3001/api/v1/docs |
 | Status | http://localhost:3001/status |
-| Adminer (banco) | http://localhost:8080 |
+| Adminer | http://localhost:8080 |
 
 ---
 
-### Sem Docker (desenvolvimento local)
+### Desenvolvimento local (SQLite)
 
 ```bash
 npm install
 cp .env.example .env
-# Configure DATABASE_URL no .env
 
 npx prisma migrate dev --name init
 npm run prisma:seed
@@ -51,7 +47,7 @@ npm run dev
 
 ---
 
-## Credenciais Padrão (após seed)
+## Credenciais padrão (após seed)
 
 | Tipo | Email | Senha |
 |------|-------|-------|
@@ -63,17 +59,19 @@ npm run dev
 ## Fluxo ERP
 
 ```
-1. Admin faz login          → POST /api/v1/auth/admin/login
-2. Admin cadastra loja      → POST /api/v1/cadastrar  (recebe apiKey)
-3. ERP usa apiKey           → Header: X-API-Key: <apiKey>
-4. ERP sincroniza produtos  → POST /api/v1/produtos
-5. ERP recebe pedidos       → webhook automático → POST <webhookUrl>
-6. ERP atualiza status      → PATCH /api/v1/pedidos/:id/status
+1. Admin faz login              → POST /api/v1/auth/admin/login
+2. Admin cadastra loja          → POST /api/v1/cadastrar  (recebe apiKey)
+3. ERP gera token de integração → POST /api/v1/tokens
+4. ERP copia .env               → GET  /api/v1/tokens/env
+5. ERP sincroniza produtos      → POST /api/v1/produtos
+6. ERP configura webhook        → POST /api/v1/webhook/configurar
+7. API notifica ERP             → POST <webhookUrl> (automático)
+8. ERP atualiza status          → PATCH /api/v1/pedidos/:id/status
 ```
 
 ---
 
-## Endpoints Principais
+## Endpoints principais
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
@@ -85,10 +83,12 @@ npm run dev
 | GET/POST | `/api/v1/categorias` | Categorias |
 | GET/POST | `/api/v1/clientes` | Clientes |
 | GET/POST | `/api/v1/pedidos` | Pedidos |
+| POST | `/api/v1/tokens` | Gerar token ERP |
+| GET | `/api/v1/tokens/env` | .env pronto para ERP |
 | POST | `/api/v1/webhook/configurar` | Configurar webhook |
 | GET | `/api/v1/admin/dashboard` | Dashboard admin |
 
-Documentação completa: [`docs/API.md`](docs/API.md) ou Swagger em `/api/v1/docs`.
+Documentação completa: [`docs/API.md`](docs/API.md)
 
 ---
 
@@ -98,40 +98,52 @@ Documentação completa: [`docs/API.md`](docs/API.md) ou Swagger em `/api/v1/doc
 |----------|--------|
 | Admin | `Authorization: Bearer <token>` |
 | Loja (JWT) | `Authorization: Bearer <token>` |
-| Loja (API Key) | `X-API-Key: <apiKey>` |
+| Loja / ERP (API Key) | `X-API-Key: <apiKey ou lojapi_...>` |
 
 ---
 
-## Comandos Docker Úteis
+## Comandos Docker
 
 ```bash
-# Ver logs da API
+# Logs da API
 docker logs lojapi -f
 
-# Rodar migrations manualmente
+# Migrations
 docker exec lojapi npx prisma migrate deploy
 
-# Acessar o banco via Adminer
-# http://localhost:8080
-# Sistema: PostgreSQL | Servidor: postgres | Usuário: lojapi | Senha: lojapi | Banco: lojapi
+# Seed
+docker exec lojapi node dist/seed.js
 
-# Parar tudo
+# Parar
 docker-compose down
 
-# Parar e remover volumes (apaga o banco)
+# Parar e apagar banco
 docker-compose down -v
 ```
 
 ---
 
-## Variáveis de Ambiente
+## Variáveis de ambiente
 
 | Variável | Descrição | Padrão |
 |----------|-----------|--------|
 | `DATABASE_URL` | URL do banco | PostgreSQL local |
-| `JWT_SECRET` | Chave JWT | — (obrigatório) |
+| `JWT_SECRET` | Chave JWT | — obrigatório |
 | `JWT_EXPIRES_IN` | Expiração do token | `7d` |
 | `PORT` | Porta da API | `3001` |
 | `NODE_ENV` | Ambiente | `production` |
 | `CORS_ORIGIN` | Origens permitidas | `*` |
 | `RATE_LIMIT_MAX` | Req. por janela | `100` |
+
+---
+
+## Infraestrutura de produção
+
+| Recurso | Detalhe |
+|---------|---------|
+| API | Azure Container Apps — Brazil South |
+| Banco | PostgreSQL 16 Flexible Server (Azure) |
+| Registry | `lojapiregistry.azurecr.io` |
+| SSL | Certificado gerenciado Azure (Let's Encrypt) |
+| Worker | Cloudflare Worker `lojapi-worker.brasoftec.workers.dev` |
+| CI/CD | GitHub Actions — build + deploy a cada push na `main` |

@@ -5,48 +5,48 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Store API',
+      title: 'lojapi',
       version: '1.0.0',
       description: `
-## API Multi-Loja
+## API REST Multi-Loja
 
-Sistema completo de gerenciamento de lojas com painel administrativo.
+Integração de ERPs e painéis com lojas isoladas por \`storeId\`.
 
 ### Autenticação
-
-A API usa dois tipos de autenticação:
-
-1. **JWT Bearer Token** — Para o painel admin e usuários de loja
-2. **API Key** — Para integrações externas (header \`X-API-Key\`)
-
-### Fluxo de uso
-
-1. Admin cadastra uma loja via \`POST /api/v1/cadastrar\`
-2. Loja recebe sua \`apiKey\` única
-3. Loja usa a \`apiKey\` + \`storeId\` para acessar seus endpoints
-4. Admin gerencia tudo pelo painel usando JWT
-
-### Headers necessários por contexto
 
 | Contexto | Header |
 |----------|--------|
 | Admin | \`Authorization: Bearer <token>\` |
-| Loja (API Key) | \`X-API-Key: <apiKey>\` |
 | Loja (JWT) | \`Authorization: Bearer <token>\` |
+| Loja (API Key nativa) | \`X-API-Key: <apiKey>\` |
+| ERP (Integration Token) | \`X-API-Key: lojapi_...\` |
+
+### Fluxo ERP
+
+\`\`\`
+1. Admin faz login              → POST /api/v1/auth/admin/login
+2. Admin cadastra loja          → POST /api/v1/cadastrar
+3. ERP gera token de integração → POST /api/v1/tokens
+4. ERP copia .env               → GET  /api/v1/tokens/env
+5. ERP sincroniza produtos      → POST /api/v1/produtos
+6. ERP configura webhook        → POST /api/v1/webhook/configurar
+7. API notifica ERP             → POST <webhookUrl> (automático)
+8. ERP atualiza status          → PATCH /api/v1/pedidos/:id/status
+\`\`\`
       `,
       contact: {
         name: 'Suporte',
-        email: 'suporte@sistema.com',
+        email: 'suporte@ofertatop.com.br',
       },
     },
     servers: [
       {
-        url: 'http://localhost:3001',
-        description: 'Desenvolvimento',
+        url: 'https://api.ofertatop.com.br',
+        description: 'Produção',
       },
       {
-        url: 'https://api.seudominio.com',
-        description: 'Produção',
+        url: 'http://localhost:3001',
+        description: 'Desenvolvimento',
       },
     ],
     components: {
@@ -55,13 +55,13 @@ A API usa dois tipos de autenticação:
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Token JWT obtido no login',
+          description: 'Token JWT obtido no login (admin ou loja)',
         },
         ApiKeyAuth: {
           type: 'apiKey',
           in: 'header',
           name: 'X-API-Key',
-          description: 'API Key da loja',
+          description: 'API Key nativa da loja ou Integration Token (lojapi_...)',
         },
       },
       schemas: {
@@ -91,6 +91,7 @@ A API usa dois tipos de autenticação:
       { name: 'Clientes', description: 'Clientes da loja' },
       { name: 'Pedidos', description: 'Pedidos da loja' },
       { name: 'Webhook', description: 'Configuração e logs de webhooks' },
+      { name: 'Tokens ERP', description: 'Tokens de integração para ERP' },
       { name: 'Admin', description: 'Painel administrativo' },
     ],
   },
