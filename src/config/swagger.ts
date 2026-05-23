@@ -24,7 +24,7 @@ Integração de ERPs e painéis com lojas isoladas por \`storeId\`.
 \`\`\`
 1. Admin login        → POST /api/v1/auth/admin/login
 2. Cadastrar loja     → POST /api/v1/cadastrar
-3. Gerar token ERP    → POST /api/v1/tokens
+3. Gerar token ERP    → POST /api/v1/tokens  (retorna tk-ot...bra)
 4. Copiar .env        → GET  /api/v1/tokens/env
 5. Sincronizar prod.  → POST /api/v1/produtos
 6. Configurar webhook → POST /api/v1/webhook/configurar
@@ -35,7 +35,6 @@ Integração de ERPs e painéis com lojas isoladas por \`storeId\`.
     },
     servers: [
       { url: 'https://api.ofertatop.com.br', description: 'Produção' },
-      { url: 'http://localhost:3001', description: 'Desenvolvimento' },
     ],
     components: {
       securitySchemes: {
@@ -45,7 +44,7 @@ Integração de ERPs e painéis com lojas isoladas por \`storeId\`.
         },
         ApiKeyAuth: {
           type: 'apiKey', in: 'header', name: 'X-API-Key',
-          description: 'API Key nativa ou Integration Token (lojapi_...)',
+          description: 'API Key nativa ou Integration Token (tk-ot...bra)',
         },
       },
       schemas: {

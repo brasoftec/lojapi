@@ -19,8 +19,10 @@ export class TokenController {
       const storeId = req.store!.id;
       const { name, expiresInDays } = req.body;
 
-      // Gera um token único e seguro
-      const token = `lojapi_${uuidv4().replace(/-/g, '')}_${uuidv4().replace(/-/g, '')}`;
+      // Gera token no formato: tk-ot<32chars>bra
+      const rand1 = uuidv4().replace(/-/g, '');
+      const rand2 = uuidv4().replace(/-/g, '').substring(0, 16);
+      const token = `tk-ot${rand1}${rand2}bra`;
 
       const expiresAt = expiresInDays
         ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
@@ -80,10 +82,10 @@ export class TokenController {
         orderBy: { createdAt: 'desc' },
       });
 
-      // Mascara os tokens na listagem
+      // Mascara os tokens: mostra prefixo tk-ot... e sufixo ...bra
       const masked = tokens.map(t => ({
         ...t,
-        token: `${t.token.substring(0, 14)}...${t.token.substring(t.token.length - 8)}`,
+        token: `${t.token.substring(0, 10)}...${t.token.substring(t.token.length - 6)}`,
       }));
 
       res.json(masked);
