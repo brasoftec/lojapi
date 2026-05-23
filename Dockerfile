@@ -12,8 +12,8 @@ COPY tsconfig.json ./
 COPY prisma ./prisma
 COPY src ./src
 
-# Gera o Prisma Client
-RUN npx prisma generate
+# Gera o Prisma Client (usando schema de produção PostgreSQL)
+RUN cp prisma/schema.prod.prisma prisma/schema.prisma && npx prisma generate
 
 # Compila TypeScript
 RUN npm run build
@@ -33,6 +33,8 @@ RUN apk add --no-cache openssl
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+# Garante que o schema de produção está ativo no container
+RUN cp prisma/schema.prod.prisma prisma/schema.prisma
 COPY package.json ./
 
 # Cria diretório de uploads
@@ -47,3 +49,4 @@ EXPOSE 3001
 
 # Roda migrations e inicia o servidor
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
+  

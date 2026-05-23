@@ -54,7 +54,7 @@ export const requireSuperAdmin = async (req: Request, res: Response, next: NextF
   next();
 };
 
-// ─── Middleware: API Key da Loja ──────────────────────────────────────────────
+// ─── Middleware: API Key da Loja (apiKey nativa OU IntegrationToken) ──────────
 export const authenticateApiKey = async (req: Request, res: Response, next: NextFunction) => {
   const apiKey = req.headers['x-api-key'] as string;
 
@@ -62,16 +62,45 @@ export const authenticateApiKey = async (req: Request, res: Response, next: Next
     return res.status(401).json({ error: 'API Key não fornecida' });
   }
 
+  // 1. Tenta como apiKey nativa da loja
   const store = await prisma.store.findUnique({
     where: { apiKey },
     select: { id: true, slug: true, name: true, apiKey: true, active: true },
   });
 
-  if (!store || !store.active) {
-    return res.status(401).json({ error: 'API Key inválida ou loja inativa' });
+  if (store && store.active) {
+    req.store = store;
+    return next();
   }
 
-  req.store = store;
+  // 2. Tenta como IntegrationToken
+  const integrationToken = await prisma.integrationToken.findUnique({
+    where: { token: apiKey },
+    include: {
+      store: { select: { id: true, slug: true, name: true, apiKey: true, active: true } },
+    },
+  });
+
+  if (!integrationToken || !integrationToken.active) {
+    return res.status(401).json({ error: 'API Key inválida ou revogada' });
+  }
+
+  if (!integrationToken.store.active) {
+    return res.status(401).json({ error: 'Loja inativa' });
+  }
+
+  // Verifica expiração
+  if (integrationToken.expiresAt && integrationToken.expiresAt < new Date()) {
+    return res.status(401).json({ error: 'Token expirado' });
+  }
+
+  // Atualiza lastUsedAt de forma assíncrona (não bloqueia a request)
+  prisma.integrationToken.update({
+    where: { id: integrationToken.id },
+    data: { lastUsedAt: new Date() },
+  }).catch(() => {});
+
+  req.store = integrationToken.store;
   next();
 };
 

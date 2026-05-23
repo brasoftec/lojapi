@@ -1,9 +1,10 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -34,8 +35,8 @@ model Store {
   logo        String?
   banner      String?
   description String?
-  address     String?  // JSON serializado
-  settings    String?  // JSON serializado
+  address     String?
+  settings    String?
   active      Boolean  @default(true)
   plan        String   @default("FREE")
   apiKey      String   @unique @default(uuid())
@@ -110,8 +111,8 @@ model Product {
   barcode      String?
   stock        Int      @default(0)
   trackStock   Boolean  @default(true)
-  images       String   @default("[]") // JSON array serializado
-  attributes   String?  // JSON serializado
+  images       String   @default("[]")
+  attributes   String?
   active       Boolean  @default(true)
   featured     Boolean  @default(false)
   createdAt    DateTime @default(now())
@@ -135,7 +136,7 @@ model Customer {
   phone     String?
   document  String?
   birthDate DateTime?
-  addresses String   @default("[]") // JSON array serializado
+  addresses String   @default("[]")
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -162,8 +163,8 @@ model Order {
   shipping        Float    @default(0)
   total           Float
   notes           String?
-  shippingAddress String?  // JSON serializado
-  metadata        String?  // JSON serializado
+  shippingAddress String?
+  metadata        String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -184,7 +185,7 @@ model OrderItem {
   price      Float
   quantity   Int
   total      Float
-  attributes String? // JSON serializado
+  attributes String?
 
   order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product    Product? @relation(fields: [productId], references: [id])
@@ -215,7 +216,7 @@ model WebhookLog {
   id        String   @id @default(uuid())
   storeId   String
   event     String
-  payload   String   // JSON serializado
+  payload   String
   status    Int      @default(0)
   response  String?
   attempts  Int      @default(0)
