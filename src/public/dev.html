@@ -3,111 +3,246 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>lojapi — Developer Portal</title>
+<title>Portal do Desenvolvedor</title>
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="https://font.brasoftec.com.br/fonts/instrument-sans/instrument-sans.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#0f0f11;--surface:#18181b;--border:#27272a;--border2:#3f3f46;
-  --text:#fafafa;--muted:#71717a;--accent:#6366f1;--accent2:#818cf8;
-  --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--blue:#3b82f6;
+  /* ── Paleta principal (tema claro para login, escuro para app) ── */
+  --white:#ffffff;
+  --bg-login:#f4f6f8;
+  --navy:#0d2137;
+  --navy2:#1a3a5c;
+  --green:#2d7a3a;
+  --green2:#245f2e;
+  --green-light:#e8f5ea;
+  --border-input:#d0d7de;
+  --text-label:#0d2137;
+  --text-input:#1a1a2e;
+  --placeholder:#9aa5b4;
+  --red:#dc2626;
+  /* ── App (dark) ── */
+  --bg:#0d1117;
+  --surface:#161b22;
+  --border:#30363d;
+  --border2:#484f58;
+  --text:#e6edf3;
+  --muted:#7d8590;
+  --accent:#2d7a3a;
+  --accent2:#3a9e4a;
+  --yellow:#d29922;
+  --blue:#388bfd;
   --font:'Instrument Sans',system-ui,sans-serif;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh}
+body{background:var(--bg-login);color:var(--text-input);font-family:var(--font);font-size:14px;min-height:100vh}
 button{cursor:pointer;font-family:var(--font);font-size:14px}
-input,select,textarea{font-family:var(--font);font-size:14px}
+input,select,textarea{font-family:var(--font);font-size:15px}
 
-/* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px}
-.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.login-logo img{width:32px;height:32px;border-radius:8px}
-.login-logo span{font-size:20px;font-weight:700;letter-spacing:-.5px}
-.login-sub{color:var(--muted);font-size:13px;margin-bottom:28px}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
-.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);outline:none;transition:.15s}
-.field input:focus,.field select:focus{border-color:var(--accent)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:8px;border:none;font-weight:600;transition:.15s;white-space:nowrap;font-size:14px}
-.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
-.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
-.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(239,68,68,.3)}.btn-danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
-.btn-sm{padding:5px 12px;font-size:12px}
-.btn-full{width:100%}
-.err-box{background:#450a0a22;border:1px solid var(--red);border-radius:8px;padding:10px 14px;color:var(--red);font-size:13px;margin-bottom:16px;display:none}
+/* ── LOGIN ─────────────────────────────────────────────────────── */
+#login-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:20px;
+  background:var(--bg-login);
+}
+.login-box{
+  background:var(--white);
+  border:1px solid #e1e8ef;
+  border-radius:20px;
+  padding:44px 40px 40px;
+  width:100%;max-width:420px;
+  box-shadow:0 4px 24px rgba(0,0,0,.07);
+}
 
-/* APP */
-#app{display:none;min-height:100vh;flex-direction:column}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+/* campos */
+.field{margin-bottom:20px}
+.field label{
+  display:block;font-size:14px;font-weight:700;
+  color:var(--text-label);margin-bottom:8px;
+}
+.field input,.field select{
+  width:100%;
+  background:var(--white);
+  border:1.5px solid var(--border-input);
+  border-radius:12px;
+  padding:14px 16px;
+  color:var(--text-input);
+  outline:none;
+  transition:.15s;
+  font-size:15px;
+}
+.field input::placeholder{color:var(--placeholder)}
+.field input:focus,.field select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(45,122,58,.12)}
+
+/* campo senha com olho */
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:46px}
+.eye-btn{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--placeholder);
+  display:flex;align-items:center;padding:0;
+}
+.eye-btn:hover{color:var(--text-input)}
+
+/* botão entrar */
+.btn-login-main{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:60%;
+  background:var(--green);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:16px 24px;
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:.15s;
+  margin-top:8px;
+}
+.btn-login-main:hover{background:var(--green2)}
+.btn-login-main svg{width:16px;height:16px}
+
+.err-box{
+  background:#fef2f2;border:1px solid #fca5a5;
+  border-radius:10px;padding:10px 14px;
+  color:var(--red);font-size:13px;margin-bottom:16px;display:none;
+}
+
+/* ── APP (dark) ─────────────────────────────────────────────────── */
+#app{display:none;min-height:100vh;flex-direction:column;background:var(--bg)}
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 24px;height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
 .tl{display:flex;align-items:center;gap:12px}
-.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
-.logo img{width:24px;height:24px;border-radius:6px}
-.store-pill{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--muted)}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--text)}
+.logo img{width:26px;height:26px;border-radius:7px}
+.store-pill{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;padding:3px 10px;font-size:12px;color:var(--muted);
+}
 .store-pill b{color:var(--text)}
 .tr{display:flex;align-items:center;gap:8px}
 .user-chip{font-size:12px;color:var(--muted);text-align:right}
 .user-chip b{display:block;color:var(--text);font-size:13px}
 
-/* LAYOUT */
+/* sidebar */
 .layout{display:flex;flex:1}
-.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);padding:14px 10px;flex-shrink:0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto}
+.sidebar{
+  width:210px;background:var(--surface);border-right:1px solid var(--border);
+  padding:14px 10px;flex-shrink:0;
+  position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;
+}
 .nav-sec{margin-bottom:18px}
-.nav-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:5px}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;color:var(--muted);cursor:pointer;transition:.12s;font-weight:500;border:none;background:transparent;width:100%;text-align:left;font-size:13px}
-.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-lbl{
+  font-size:10px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:5px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;
+  border-radius:7px;color:var(--muted);cursor:pointer;transition:.12s;
+  font-weight:500;border:none;background:transparent;
+  width:100%;text-align:left;font-size:13px;
+}
+.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
 .nav-item.active{background:var(--accent);color:#fff}
 .nav-item svg{width:14px;height:14px;flex-shrink:0}
-.main{flex:1;padding:28px;max-width:860px}
+
+/* main */
+.main{flex:1;padding:28px;max-width:860px;color:var(--text)}
 .page{display:none}.page.active{display:block}
-.pg-title{font-size:21px;font-weight:700;letter-spacing:-.5px;margin-bottom:3px}
+.pg-title{font-size:21px;font-weight:700;letter-spacing:-.5px;margin-bottom:3px;color:var(--text)}
 .pg-sub{color:var(--muted);font-size:13px;margin-bottom:22px}
 
-/* CARDS */
+/* cards */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
-.card-hd{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.card-hd{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px;color:var(--text)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px}
-.stat-v{font-size:26px;font-weight:700;letter-spacing:-1px}
+.stat-v{font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--text)}
 .stat-l{font-size:12px;color:var(--muted);margin-top:2px}
 
-/* BADGES */
+/* badges */
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
-.bg{background:#14532d;color:var(--green)}.br{background:#450a0a;color:var(--red)}
-.by{background:#451a03;color:var(--yellow)}.bb{background:#1e3a5f;color:var(--blue)}
-.bm{background:#27272a;color:var(--muted)}
+.bg{background:#0d2e14;color:#4ade80}.br{background:#2d0a0a;color:#f87171}
+.by{background:#2d1f00;color:#fbbf24}.bb{background:#0a1f3d;color:#60a5fa}
+.bm{background:#21262d;color:var(--muted)}
 
-/* TABLE */
+/* table */
 .tw{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse}
 th{background:var(--bg);padding:9px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
-td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;color:var(--text)}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.015)}
+tr:hover td{background:rgba(255,255,255,.02)}
 
-/* CODE */
-.code{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px 15px;font-family:'Courier New',monospace;font-size:12px;color:#a5f3fc;overflow-x:auto;position:relative;margin:8px 0;line-height:1.6}
+/* code */
+.code{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px 15px;font-family:'Courier New',monospace;font-size:12px;color:#79c0ff;overflow-x:auto;position:relative;margin:8px 0;line-height:1.6}
 .cpbtn{position:absolute;top:8px;right:8px;background:var(--border);border:none;color:var(--muted);padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer}
 .cpbtn:hover{background:var(--border2);color:var(--text)}
-.token-val{background:var(--bg);border:1px solid var(--green);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:12px;color:var(--green);word-break:break-all;margin:12px 0}
-.env-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'Courier New',monospace;font-size:12px;color:#86efac;line-height:1.8;white-space:pre-wrap;margin:10px 0}
+.token-val{background:var(--bg);border:1px solid var(--accent);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:12px;color:#4ade80;word-break:break-all;margin:12px 0}
+.env-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'Courier New',monospace;font-size:12px;color:#7ee787;line-height:1.8;white-space:pre-wrap;margin:10px 0}
 
-/* MISC */
+/* botões app */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 16px;border-radius:8px;border:none;font-weight:600;transition:.15s;white-space:nowrap;font-size:13px;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+.btn-danger{background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.3)}.btn-danger:hover{background:#2d0a0a;color:#f87171}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-full{width:100%}
+
+/* misc */
 .flex{display:flex;align-items:center;gap:8px}
 .fb{display:flex;align-items:center;justify-content:space-between}
 .fr{display:flex;align-items:flex-end;gap:10px;margin-bottom:14px}
 .fr .field{flex:1;margin-bottom:0}
+/* campos dentro do app (dark) */
+.fr .field input,.fr .field select,
+.card .field input,.card .field select{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:9px 12px;color:var(--text);outline:none;transition:.15s;font-size:13px;
+}
+.fr .field input:focus,.card .field input:focus{border-color:var(--accent)}
+.fr .field label,.card .field label{
+  display:block;font-size:11px;font-weight:700;color:var(--muted);
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;
+}
 .mt{margin-top:14px}.mb{margin-bottom:8px}
 .muted{color:var(--muted)}.sm{font-size:12px}
 .empty{text-align:center;padding:36px;color:var(--muted)}
-.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 17px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(70px);opacity:0;transition:.22s;max-width:300px}
+/* spinner do botão */
+.btn-spinner{
+  --size:18px;
+  --first-block-clr:#fff;
+  --second-block-clr:rgba(255,255,255,.4);
+  width:var(--size);height:var(--size);
+  position:relative;display:inline-block;flex-shrink:0;
+}
+.btn-spinner::after,.btn-spinner::before{
+  box-sizing:border-box;position:absolute;content:"";
+  width:calc(var(--size)*0.45);height:calc(var(--size)*0.45);
+  top:50%;left:50%;
+  background:var(--first-block-clr);
+  animation:sp-up 1.2s cubic-bezier(0,0,.24,1.21) infinite;
+}
+.btn-spinner::after{
+  background:var(--second-block-clr);
+  top:calc(50% - calc(var(--size)*0.45));
+  left:calc(50% - calc(var(--size)*0.45));
+  animation:sp-down 1.2s cubic-bezier(0,0,.24,1.21) infinite;
+}
+@keyframes sp-down{0%,100%{transform:none}25%{transform:translateX(100%)}50%{transform:translateX(100%) translateY(100%)}75%{transform:translateY(100%)}}
+@keyframes sp-up{0%,100%{transform:none}25%{transform:translateX(-100%)}50%{transform:translateX(-100%) translateY(-100%)}75%{transform:translateY(-100%)}}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 17px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(70px);opacity:0;transition:.22s;max-width:300px;color:var(--text)}
 #toast.show{transform:translateY(0);opacity:1}
-#toast.ok{border-color:var(--green);color:var(--green)}
-#toast.err{border-color:var(--red);color:var(--red)}
+#toast.ok{border-color:var(--accent);color:#4ade80}
+#toast.err{border-color:#f87171;color:#f87171}
 .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
-.dot-green{background:var(--green)}.dot-red{background:var(--red)}.dot-yellow{background:var(--yellow)}
+.dot-green{background:#4ade80}.dot-red{background:#f87171}.dot-yellow{background:#fbbf24}
 </style>
 </head>
 <body>
@@ -115,25 +250,24 @@ tr:hover td{background:rgba(255,255,255,.015)}
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">
-      <img src="/favicon.png" alt="">
-      <span>lojapi</span>
-    </div>
     <div id="login-err" class="err-box"></div>
-    <div class="field" id="slug-field">
-      <label>Slug da loja</label>
-      <input id="login-slug" placeholder="minha-loja">
-    </div>
     <div class="field">
       <label>Email</label>
       <input id="login-email" type="email" placeholder="email@loja.com">
     </div>
     <div class="field">
       <label>Senha</label>
-      <input id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="pass-wrap">
+        <input id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="eye-btn" type="button" onclick="togglePass()" tabindex="-1">
+          <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 15 15"><path d="M0 0h15v15H0z" fill="none"/><path fill="currentColor" d="M7.5 9C5.186 9 3.561 7.848 2.497 6.666a9.4 9.4 0 0 1-1.449-2.164l-.08-.18l-.004-.007v-.001L.5 4.5l-.464.186v.002l.003.004l.026.063l.078.173a10.4 10.4 0 0 0 1.61 2.406C2.94 8.652 4.814 10 7.5 10zm7-4.5l-.464-.186l-.003.008l-.015.035l-.066.145a9.4 9.4 0 0 1-1.449 2.164C11.44 7.848 9.814 9 7.5 9v1c2.686 0 4.561-1.348 5.747-2.666a10.4 10.4 0 0 0 1.61-2.406a6 6 0 0 0 .104-.236l.002-.004v-.001h.001zM8 12V9.5H7V12zm-6.646-1.646l2-2l-.708-.708l-2 2zm10.292-2l2 2l.708-.708l-2-2z"/></svg>
+        </button>
+      </div>
     </div>
-    <button class="btn btn-primary btn-full" id="btn-login" onclick="doLogin()">Entrar</button>
-    <p class="sm muted" style="margin-top:16px;text-align:center">Não tem acesso? <a href="mailto:suporte@ofertatop.com.br" style="color:var(--accent2)">Solicite à equipe lojapi</a></p>
+    <button class="btn-login-main" id="btn-login" onclick="doLogin()">
+      ENTRAR
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
   </div>
 </div>
 
@@ -416,26 +550,65 @@ async function req(method,path,body){
 }
 
 // ── AUTH ───────────────────────────────────────────────────────────────────
+function togglePass(){
+  const inp=document.getElementById('login-pass');
+  const icon=document.getElementById('eye-icon');
+  if(inp.type==='password'){
+    inp.type='text';
+    // olho aberto
+    icon.setAttribute('viewBox','0 0 24 24');
+    icon.setAttribute('fill','none');
+    icon.setAttribute('stroke','currentColor');
+    icon.setAttribute('stroke-width','2');
+    icon.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  } else {
+    inp.type='password';
+    // olho fechado (ícone fornecido)
+    icon.setAttribute('viewBox','0 0 15 15');
+    icon.setAttribute('fill','none');
+    icon.removeAttribute('stroke');
+    icon.removeAttribute('stroke-width');
+    icon.innerHTML='<path d="M0 0h15v15H0z" fill="none"/><path fill="currentColor" d="M7.5 9C5.186 9 3.561 7.848 2.497 6.666a9.4 9.4 0 0 1-1.449-2.164l-.08-.18l-.004-.007v-.001L.5 4.5l-.464.186v.002l.003.004l.026.063l.078.173a10.4 10.4 0 0 0 1.61 2.406C2.94 8.652 4.814 10 7.5 10zm7-4.5l-.464-.186l-.003.008l-.015.035l-.066.145a9.4 9.4 0 0 1-1.449 2.164C11.44 7.848 9.814 9 7.5 9v1c2.686 0 4.561-1.348 5.747-2.666a10.4 10.4 0 0 0 1.61-2.406a6 6 0 0 0 .104-.236l.002-.004v-.001h.001zM8 12V9.5H7V12zm-6.646-1.646l2-2l-.708-.708l-2 2zm10.292-2l2 2l.708-.708l-2-2z"/>';
+  }
+}
 function showErr(m){const e=document.getElementById('login-err');e.textContent=m;e.style.display='block'}
 
 async function doLogin(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
-  const slug=document.getElementById('login-slug').value.trim();
   if(!email||!pass){showErr('Preencha email e senha');return}
-  if(!slug){showErr('Informe o slug da loja');return}
   const btn=document.getElementById('btn-login');
-  btn.innerHTML='<span class="spin"></span> Entrando...';btn.disabled=true;
+  btn.innerHTML='<span class="btn-spinner"></span>';btn.disabled=true;
   try{
-    const d=await fetch(BASE+'/auth/loja/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,storeSlug:slug})}).then(r=>r.json());
-    if(d.error)throw new Error(d.error);
-    S.token=d.token;S.name=d.user.name;S.role=d.user.role;
-    S.storeId=d.store.id;S.slug=d.store.slug;S.storeName=d.store.name;
-    const loja=await fetch(BASE+'/loja',{headers:{'Authorization':'Bearer '+d.token}}).then(r=>r.json());
+    // Tenta login admin primeiro
+    const adminRes=await fetch(BASE+'/auth/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})}).then(r=>r.json());
+    if(!adminRes.error){
+      S.token=adminRes.token;S.name=adminRes.user.name;S.role=adminRes.user.role;S.storeName='Admin Global';
+      startApp();btn.innerHTML='Entrar';btn.disabled=false;return;
+    }
+    // Tenta login de loja — slug salvo do último login ou derivado do email
+    const savedSlug=localStorage.getItem('lojapi_slug')||'';
+    const slugGuess=savedSlug||email.split('@')[0].replace(/[^a-z0-9]/gi,'-').toLowerCase();
+    const d=await fetch(BASE+'/auth/loja/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,storeSlug:slugGuess})}).then(r=>r.json());
+    if(d.error){
+      // Se falhou com o slug derivado, pede o slug
+      const slug=prompt('Informe o slug da sua loja (ex: minha-loja):','');
+      if(!slug){btn.innerHTML='Entrar';btn.disabled=false;return}
+      const d2=await fetch(BASE+'/auth/loja/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,storeSlug:slug})}).then(r=>r.json());
+      if(d2.error)throw new Error(d2.error);
+      localStorage.setItem('lojapi_slug',slug);
+      S.token=d2.token;S.name=d2.user.name;S.role=d2.user.role;
+      S.storeId=d2.store.id;S.slug=d2.store.slug;S.storeName=d2.store.name;
+    } else {
+      localStorage.setItem('lojapi_slug',d.store.slug);
+      S.token=d.token;S.name=d.user.name;S.role=d.user.role;
+      S.storeId=d.store.id;S.slug=d.store.slug;S.storeName=d.store.name;
+    }
+    const loja=await fetch(BASE+'/loja',{headers:{'Authorization':'Bearer '+S.token}}).then(r=>r.json());
     S.apiKey=loja.apiKey;S.storeId=loja.id;
     startApp();
   }catch(e){showErr(e.message)}
-  btn.innerHTML='Entrar';btn.disabled=false;
+  btn.innerHTML='ENTRAR <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>';btn.disabled=false;
 }
 
 function startApp(){
