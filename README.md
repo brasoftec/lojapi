@@ -145,5 +145,4 @@ docker-compose down -v
 | Banco | PostgreSQL 16 Flexible Server (Azure) |
 | Registry | `lojapiregistry.azurecr.io` |
 | SSL | Certificado gerenciado Azure (Let's Encrypt) |
-| Worker | Cloudflare Worker `lojapi-worker.brasoftec.workers.dev` |
 | CI/CD | GitHub Actions — build + deploy a cada push na `main` |
