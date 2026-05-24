@@ -11,6 +11,11 @@ import { notFound } from './middlewares/notFound';
 const app = express();
 
 // ─── Segurança ────────────────────────────────────────────────────────────────
+// CSP permissivo para o portal /dev (inline scripts e handlers necessários)
+app.use('/dev', helmet({
+  contentSecurityPolicy: false,
+}));
+app.use('/favicon.png', helmet({ contentSecurityPolicy: false }));
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
