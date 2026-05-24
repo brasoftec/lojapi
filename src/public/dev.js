@@ -2,6 +2,37 @@
 let S = { token: null, apiKey: null, storeId: null, slug: null, name: null };
 let prodPage = 1, ordPage = 1;
 
+// ── SESSION PERSISTENCE ────────────────────────────────────────────────────
+function saveSession() {
+  localStorage.setItem('lojapi_session', JSON.stringify({
+    token: S.token, apiKey: S.apiKey, storeId: S.storeId,
+    slug: S.slug, name: S.name, role: S.role, storeName: S.storeName
+  }));
+}
+
+function clearSession() {
+  localStorage.removeItem('lojapi_session');
+  localStorage.removeItem('lojapi_slug');
+}
+
+async function tryRestoreSession() {
+  var raw = localStorage.getItem('lojapi_session');
+  if (!raw) return false;
+  try {
+    var saved = JSON.parse(raw);
+    if (!saved.token) return false;
+    // Valida o token contra a API
+    var r = await fetch(BASE + '/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + saved.token }
+    });
+    if (!r.ok) { clearSession(); return false; }
+    // Token ainda válido — restaura estado completo
+    S.token = saved.token; S.apiKey = saved.apiKey; S.storeId = saved.storeId;
+    S.slug = saved.slug; S.name = saved.name; S.role = saved.role; S.storeName = saved.storeName;
+    return true;
+  } catch(e) { clearSession(); return false; }
+}
+
 function toast(m, t) {
   var el = document.getElementById('toast');
   el.textContent = m; el.className = 'show ' + (t || 'ok');
@@ -20,9 +51,14 @@ function badge(s) {
   var m = { PENDING: 'by', CONFIRMED: 'bb', PROCESSING: 'bb', SHIPPED: 'bb', DELIVERED: 'bg', CANCELLED: 'br', REFUNDED: 'bm', PAID: 'bg', FAILED: 'br' };
   return '<span class="badge ' + (m[s] || 'bm') + '">' + s + '</span>';
 }
+// ── AUTH ───────────────────────────────────────────────────────────────────
+// Retorna true se o usuário logado é admin global
+function isAdmin() { return S.role === 'SUPER_ADMIN' || S.role === 'ADMIN'; }
+
+// Para admin, usa sempre Bearer token; para loja, usa apiKey se disponível
 async function req(method, path, body) {
   var h = { 'Content-Type': 'application/json' };
-  if (S.apiKey) h['X-API-Key'] = S.apiKey;
+  if (!isAdmin() && S.apiKey) h['X-API-Key'] = S.apiKey;
   else if (S.token) h['Authorization'] = 'Bearer ' + S.token;
   var r = await fetch(BASE + path, { method: method, headers: h, body: body ? JSON.stringify(body) : undefined });
   var d = await r.json().catch(function() { return {}; });
@@ -72,6 +108,7 @@ async function doLogin() {
         S.storeId = lojaRes.store.id; S.slug = lojaRes.store.slug; S.storeName = lojaRes.store.name;
         var loja = await fetch(BASE + '/loja', { headers: { 'Authorization': 'Bearer ' + S.token } }).then(function(r) { return r.json(); });
         S.apiKey = loja.apiKey; S.storeId = loja.id;
+        saveSession();
         btn.innerHTML = BTN_DEFAULT; btn.disabled = false;
         startApp(); return;
       }
@@ -82,6 +119,7 @@ async function doLogin() {
     }).then(function(r) { return r.json(); });
     if (!adminRes.error) {
       S.token = adminRes.token; S.name = adminRes.user.name; S.role = adminRes.user.role; S.storeName = 'Admin';
+      saveSession();
       btn.innerHTML = BTN_DEFAULT; btn.disabled = false;
       startApp(); return;
     }
@@ -96,11 +134,55 @@ function startApp() {
   document.getElementById('store-badge').textContent = S.storeName || '—';
   document.getElementById('user-name').textContent = S.name || '—';
   document.getElementById('user-role').textContent = S.role || '—';
-  checkApiStatus(); loadOverview(); loadTokens(); loadWh(); loadEnv(); loadEvents();
+  if (isAdmin()) {
+    loadAdminContext();
+  } else {
+    loadOverview(); loadTokens(); loadWh(); loadEnv(); loadEvents();
+  }
+}
+
+// Admin: carrega a primeira loja ativa e usa a apiKey dela para operar o painel
+async function loadAdminContext() {
+  try {
+    // Se já tem apiKey (sessão restaurada), carrega direto os dados da loja
+    if (S.apiKey) {
+      var store = await req('GET', '/loja');
+      document.getElementById('store-badge').textContent = store.name || S.storeName || '—';
+      document.getElementById('c-id').value = store.id || '';
+      document.getElementById('c-slug').value = store.slug || '';
+      document.getElementById('s-products').textContent = store._count ? store._count.products : '—';
+      document.getElementById('s-customers').textContent = store._count ? store._count.customers : '—';
+      document.getElementById('s-orders').textContent = store._count ? store._count.orders : '—';
+      document.getElementById('s-plan').textContent = store.plan || '—';
+      loadTokens(); loadWh(); loadEnv(); loadEvents();
+      return;
+    }
+    // Sem apiKey: busca a primeira loja ativa via rota admin
+    var d = await req('GET', '/admin/lojas?limit=1&active=true');
+    var stores = d.data || [];
+    if (!stores.length) {
+      document.getElementById('store-badge').textContent = 'Nenhuma loja';
+      return;
+    }
+    var store = stores[0];
+    S.apiKey = store.apiKey;
+    S.storeId = store.id;
+    S.slug = store.slug;
+    S.storeName = store.name;
+    saveSession();
+    document.getElementById('store-badge').textContent = store.name;
+    document.getElementById('c-id').value = store.id || '';
+    document.getElementById('c-slug').value = store.slug || '';
+    document.getElementById('s-products').textContent = store._count ? store._count.products : '—';
+    document.getElementById('s-customers').textContent = store._count ? store._count.customers : '—';
+    document.getElementById('s-orders').textContent = store._count ? store._count.orders : '—';
+    document.getElementById('s-plan').textContent = store.plan || '—';
+    loadTokens(); loadWh(); loadEnv(); loadEvents();
+  } catch(e) { toast('Erro ao carregar lojas: ' + e.message, 'err'); }
 }
 
 function logout() {
-  S = {}; localStorage.removeItem('lojapi_slug');
+  S = {}; clearSession();
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
 }
@@ -115,9 +197,8 @@ function goTo(btn, page) {
 }
 
 async function checkApiStatus() {
-  var el = document.getElementById('api-status-badge');
-  try { await fetch('/status'); el.innerHTML = '<span class="status-dot dot-green"></span><span class="sm muted">API online</span>'; }
-  catch(e) { el.innerHTML = '<span class="status-dot dot-red"></span><span class="sm muted">API offline</span>'; }
+  try { await fetch('/status'); }
+  catch(e) {}
 }
 
 async function loadOverview() {
@@ -248,7 +329,7 @@ async function loadOrds() {
     if (!d.data || !d.data.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">Nenhum pedido</td></tr>'; return; }
     tb.innerHTML = d.data.map(function(o) {
       var opts = ['CONFIRMED','PROCESSING','SHIPPED','DELIVERED','CANCELLED'].map(function(s) { return '<option>' + s + '</option>'; }).join('');
-      return '<tr><td><b>' + o.orderNumber + '</b></td><td class="muted sm">' + (o.customer && o.customer.name ? o.customer.name : '—') + '</td><td>' + money(o.total) + '</td><td>' + badge(o.status) + '</td><td>' + badge(o.paymentStatus) + '</td><td class="muted sm">' + dt(o.createdAt) + '</td><td><select class="ord-status-sel" data-id="' + o.id + '" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:11px"><option value="">Alterar...</option>' + opts + '</select></td></tr>';
+      return '<tr><td><b>' + o.orderNumber + '</b></td><td class="muted sm">' + (o.customer && o.customer.name ? o.customer.name : '—') + '</td><td>' + money(o.total) + '</td><td>' + badge(o.status) + '</td><td>' + badge(o.paymentStatus) + '</td><td class="muted sm">' + dt(o.createdAt) + '</td><td><select class="ord-status-sel" data-id="' + o.id + '" style="background:#fff;border:1.5px solid var(--border-input);border-radius:8px;padding:4px 8px;color:var(--text-input);font-size:11px"><option value="">Alterar...</option>' + opts + '</select></td></tr>';
     }).join('');
     document.querySelectorAll('.ord-status-sel').forEach(function(sel) {
       sel.addEventListener('change', function() { if (sel.value) updOrdStatus(sel.dataset.id, sel.value); });
@@ -285,7 +366,16 @@ function bindCpblockBtns() {
 }
 
 // ── BIND ALL EVENT LISTENERS ───────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+  // Tenta restaurar sessão salva antes de mostrar o login
+  var restored = await tryRestoreSession();
+  document.getElementById('loading-screen').style.display = 'none';
+  if (restored) {
+    startApp();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+
   // Login
   document.getElementById('btn-login').addEventListener('click', doLogin);
   document.getElementById('login-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
@@ -293,12 +383,16 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('eye-btn').addEventListener('click', togglePass);
   document.getElementById('btn-logout').addEventListener('click', logout);
 
+  document.getElementById('btn-sidebar-toggle').addEventListener('click', function() {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+  });
+
   // Nav items
   document.querySelectorAll('.nav-item[data-page]').forEach(function(btn) {
     btn.addEventListener('click', function() { goTo(btn, btn.dataset.page); });
   });
   document.getElementById('nav-swagger').addEventListener('click', function() { window.open('/api/v1/docs', '_blank'); });
-  document.getElementById('nav-status').addEventListener('click', function() { window.open('/status', '_blank'); });
+  document.getElementById('nav-status').addEventListener('click', function() { window.open('https://status.api.ofertatop.com.br', '_blank'); });
 
   // Copiar credenciais
   document.querySelectorAll('[data-cp]').forEach(function(b) {

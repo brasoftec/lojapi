@@ -11,13 +11,17 @@
 :root{
   --white:#fff;--bg-login:#f4f6f8;--green:#2d7a3a;--green2:#245f2e;
   --border-input:#d0d7de;--text-label:#0d2137;--text-input:#1a1a2e;--placeholder:#9aa5b4;--red:#dc2626;
-  --bg:#0d1117;--surface:#161b22;--border:#30363d;--border2:#484f58;
-  --text:#e6edf3;--muted:#7d8590;--accent:#2d7a3a;--accent2:#3a9e4a;--yellow:#d29922;--blue:#388bfd;
+  /* app theme — same as login (light) */
+  --bg:#f4f6f8;--surface:#ffffff;--border:#e1e8ef;--border2:#c8d3dc;
+  --text:#1a1a2e;--muted:#6b7a8d;--accent:#2d7a3a;--accent2:#245f2e;--yellow:#b45309;--blue:#1d4ed8;
   --font:'Instrument Sans',system-ui,sans-serif;
 }
 body{background:var(--bg-login);color:var(--text-input);font-family:var(--font);font-size:14px;min-height:100vh}
 button{cursor:pointer;font-family:var(--font)}
 input,select{font-family:var(--font)}
+#loading-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg-login)}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--border-input);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:var(--bg-login)}
 .login-box{background:var(--white);border:1px solid #e1e8ef;border-radius:20px;padding:44px 40px 40px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,.07)}
 .field{margin-bottom:20px}
@@ -38,74 +42,88 @@ input,select{font-family:var(--font)}
 @keyframes sp-dn{0%,100%{transform:none}25%{transform:translateX(100%)}50%{transform:translateX(100%) translateY(100%)}75%{transform:translateY(100%)}}
 @keyframes sp-up{0%,100%{transform:none}25%{transform:translateX(-100%)}50%{transform:translateX(-100%) translateY(-100%)}75%{transform:translateY(-100%)}}
 #app{display:none;min-height:100vh;flex-direction:column;background:var(--bg)}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.tl{display:flex;align-items:center;gap:12px}
-.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--text)}
-.logo img{width:26px;height:26px;border-radius:7px}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.tl{display:flex;align-items:center;gap:14px}
+.topbar-title{font-size:18px;font-weight:700;color:var(--text-label);letter-spacing:-.4px}
 .store-pill{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--muted)}
 .store-pill b{color:var(--text)}
 .tr{display:flex;align-items:center;gap:8px}
 .user-chip{font-size:12px;color:var(--muted);text-align:right}
 .user-chip b{display:block;color:var(--text);font-size:13px}
+/* ── Sidebar colapsável ── */
 .layout{display:flex;flex:1}
-.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);padding:14px 10px;flex-shrink:0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto}
+.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);padding:14px 10px;flex-shrink:0;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;overflow-x:hidden;transition:width .2s ease}
+.sidebar.collapsed{width:52px;padding:14px 6px}
 .nav-sec{margin-bottom:18px}
-.nav-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:5px}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;color:var(--muted);cursor:pointer;transition:.12s;font-weight:500;border:none;background:transparent;width:100%;text-align:left;font-size:13px}
-.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.nav-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:5px;white-space:nowrap;overflow:hidden;transition:opacity .15s}
+.sidebar.collapsed .nav-lbl{opacity:0;height:0;margin:0}
+.sidebar.collapsed .nav-sec{display:flex;flex-direction:column;align-items:center}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;color:var(--muted);cursor:pointer;transition:.12s;font-weight:500;border:none;background:transparent;width:100%;text-align:left;font-size:13px;white-space:nowrap;overflow:hidden}
+.nav-item:hover{background:rgba(45,122,58,.07);color:var(--text)}
 .nav-item.active{background:var(--accent);color:#fff}
-.nav-item svg{width:14px;height:14px;flex-shrink:0}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.nav-item span{transition:opacity .15s,width .15s}
+.sidebar.collapsed .nav-item span{opacity:0;width:0;overflow:hidden}
+.sidebar.collapsed .nav-item{justify-content:center;padding:8px;width:36px;margin:0 auto;border-radius:8px;position:relative;gap:0}
+.sidebar.collapsed .nav-item:hover::after{content:attr(data-tooltip);position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:var(--text-label);color:#fff;padding:4px 10px;border-radius:6px;font-size:12px;white-space:nowrap;pointer-events:none;z-index:200}/* toggle button */
+.sidebar-toggle{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;flex-shrink:0;transition:.12s}
+.sidebar-toggle:hover{border-color:var(--border2);color:var(--text);background:#f8fafc}
 .main{flex:1;padding:28px;max-width:860px;color:var(--text)}
 .page{display:none}.page.active{display:block}
-.pg-title{font-size:21px;font-weight:700;letter-spacing:-.5px;margin-bottom:3px;color:var(--text)}
+.pg-title{font-size:21px;font-weight:700;letter-spacing:-.5px;margin-bottom:3px;color:var(--text-label)}
 .pg-sub{color:var(--muted);font-size:13px;margin-bottom:22px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
-.card-hd{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px;color:var(--text)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.card-hd{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px;color:var(--text-label)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px}
-.stat-v{font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--text)}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.stat-v{font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--text-label)}
 .stat-l{font-size:12px;color:var(--muted);margin-top:2px}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
-.bg{background:#0d2e14;color:#4ade80}.br{background:#2d0a0a;color:#f87171}
-.by{background:#2d1f00;color:#fbbf24}.bb{background:#0a1f3d;color:#60a5fa}.bm{background:#21262d;color:var(--muted)}
-.tw{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+.bg{background:#dcfce7;color:#166534}.br{background:#fee2e2;color:#991b1b}
+.by{background:#fef3c7;color:#92400e}.bb{background:#dbeafe;color:#1e40af}.bm{background:#f1f5f9;color:var(--muted)}
+.tw{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse}
-th{background:var(--bg);padding:9px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+th{background:#f8fafc;padding:9px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
 td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;color:var(--text)}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.02)}
-.code{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px 15px;font-family:'Courier New',monospace;font-size:12px;color:#79c0ff;overflow-x:auto;position:relative;margin:8px 0;line-height:1.6}
+tr:hover td{background:#f8fafc}
+.code{background:#f6f8fa;border:1px solid var(--border);border-radius:10px;padding:13px 15px;font-family:'Courier New',monospace;font-size:12px;color:#0550ae;overflow-x:auto;position:relative;margin:8px 0;line-height:1.6}
 .cpbtn{position:absolute;top:8px;right:8px;background:var(--border);border:none;color:var(--muted);padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer}
 .cpbtn:hover{background:var(--border2);color:var(--text)}
-.token-val{background:var(--bg);border:1px solid var(--accent);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:12px;color:#4ade80;word-break:break-all;margin:12px 0}
-.env-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'Courier New',monospace;font-size:12px;color:#7ee787;line-height:1.8;white-space:pre-wrap;margin:10px 0}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 16px;border-radius:8px;border:none;font-weight:600;transition:.15s;white-space:nowrap;font-size:13px;cursor:pointer}
+.token-val{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;font-family:'Courier New',monospace;font-size:12px;color:#166534;word-break:break-all;margin:12px 0}
+.env-block{background:#f6f8fa;border:1px solid var(--border);border-radius:10px;padding:14px;font-family:'Courier New',monospace;font-size:12px;color:#166534;line-height:1.8;white-space:pre-wrap;margin:10px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 16px;border-radius:10px;border:none;font-weight:600;transition:.15s;white-space:nowrap;font-size:13px;cursor:pointer}
 .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
-.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
-.btn-danger{background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.3)}.btn-danger:hover{background:#2d0a0a;color:#f87171}
-.btn-sm{padding:4px 10px;font-size:12px}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ghost:hover{border-color:var(--border2);color:var(--text);background:#f8fafc}
+.btn-danger{background:transparent;color:#dc2626;border:1.5px solid #fca5a5}.btn-danger:hover{background:#fee2e2;color:#991b1b}
+.btn-sm{padding:5px 12px;font-size:12px}
 .flex{display:flex;align-items:center;gap:8px}
 .fb{display:flex;align-items:center;justify-content:space-between}
 .fr{display:flex;align-items:flex-end;gap:10px;margin-bottom:14px}
 .fr .field{flex:1;margin-bottom:0}
-.fr .field input,.fr .field select,.card .field input,.card .field select{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);outline:none;transition:.15s;font-size:13px;width:100%}
-.fr .field input:focus,.card .field input:focus{border-color:var(--accent)}
+.fr .field input,.fr .field select,.card .field input,.card .field select{background:var(--white);border:1.5px solid var(--border-input);border-radius:10px;padding:9px 12px;color:var(--text-input);outline:none;transition:.15s;font-size:13px;width:100%}
+.fr .field input:focus,.card .field input:focus,.fr .field select:focus,.card .field select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(45,122,58,.10)}
 .fr .field label,.card .field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
 .mt{margin-top:14px}.mb{margin-bottom:8px}
 .muted{color:var(--muted)}.sm{font-size:12px}
 .empty{text-align:center;padding:36px;color:var(--muted)}
-#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 17px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(70px);opacity:0;transition:.22s;max-width:300px;color:var(--text)}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px 17px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(70px);opacity:0;transition:.22s;max-width:300px;color:var(--text);box-shadow:0 4px 16px rgba(0,0,0,.10)}
 #toast.show{transform:translateY(0);opacity:1}
-#toast.ok{border-color:var(--accent);color:#4ade80}
-#toast.err{border-color:#f87171;color:#f87171}
+#toast.ok{border-color:#86efac;color:#166534}
+#toast.err{border-color:#fca5a5;color:#dc2626}
 .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
-.dot-green{background:#4ade80}.dot-red{background:#f87171}.dot-yellow{background:#fbbf24}
+.dot-green{background:#22c55e}.dot-red{background:#ef4444}.dot-yellow{background:#f59e0b}
 </style>
 </head>
 <body>
 
+<!-- LOADING (enquanto verifica sessão) -->
+<div id="loading-screen">
+  <div class="loading-spinner"></div>
+</div>
+
 <!-- LOGIN — sem nenhum handler inline -->
-<div id="login-screen">
+<div id="login-screen" style="display:none">
   <div class="login-box">
     <div id="login-err" class="err-box"></div>
     <div class="field">
@@ -136,9 +154,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div id="app">
   <div class="topbar">
     <div class="tl">
-      <div class="logo"><img src="/favicon.png" alt="">lojapi</div>
+      <button class="sidebar-toggle" id="btn-sidebar-toggle" title="Expandir/recolher menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-title">Painel do Desenvolvedor</span>
       <div class="store-pill">Loja: <b id="store-badge">—</b></div>
-      <div class="flex sm" id="api-status-badge"><span class="status-dot dot-yellow"></span><span class="muted">verificando...</span></div>
     </div>
     <div class="tr">
       <div class="user-chip"><b id="user-name">—</b><span id="user-role">—</span></div>
@@ -146,27 +166,27 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
   </div>
   <div class="layout">
-    <nav class="sidebar">
+    <nav class="sidebar" id="sidebar">
       <div class="nav-sec">
         <div class="nav-lbl">Visão geral</div>
-        <button class="nav-item active" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</button>
+        <button class="nav-item active" data-page="overview" data-tooltip="Dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Dashboard</span></button>
       </div>
       <div class="nav-sec">
         <div class="nav-lbl">Integração</div>
-        <button class="nav-item" data-page="tokens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Tokens ERP</button>
-        <button class="nav-item" data-page="webhook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Webhook</button>
-        <button class="nav-item" data-page="env"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Variáveis .env</button>
+        <button class="nav-item" data-page="tokens" data-tooltip="Tokens ERP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg><span>Tokens ERP</span></button>
+        <button class="nav-item" data-page="webhook" data-tooltip="Webhook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>Webhook</span></button>
+        <button class="nav-item" data-page="env" data-tooltip="Variáveis .env"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Variáveis .env</span></button>
       </div>
       <div class="nav-sec">
         <div class="nav-lbl">Dados</div>
-        <button class="nav-item" data-page="products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>Produtos</button>
-        <button class="nav-item" data-page="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Pedidos</button>
-        <button class="nav-item" data-page="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</button>
+        <button class="nav-item" data-page="products" data-tooltip="Produtos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg><span>Produtos</span></button>
+        <button class="nav-item" data-page="orders" data-tooltip="Pedidos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Pedidos</span></button>
+        <button class="nav-item" data-page="customers" data-tooltip="Clientes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Clientes</span></button>
       </div>
       <div class="nav-sec">
         <div class="nav-lbl">Links</div>
-        <button class="nav-item" id="nav-swagger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Swagger</button>
-        <button class="nav-item" id="nav-status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Status API</button>
+        <button class="nav-item" id="nav-swagger" data-tooltip="Documentação"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Documentação</span></button>
+        <button class="nav-item" id="nav-status" data-tooltip="Status API"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Status API</span></button>
       </div>
     </nav>
     <main class="main">
@@ -180,13 +200,13 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <div class="stat"><div class="stat-v" id="s-plan" style="font-size:17px;margin-top:4px">—</div><div class="stat-l">Plano</div></div>
         </div>
         <div class="card">
-          <div class="card-hd">🔑 Credenciais da loja</div>
-          <div class="field mb"><label>Store ID</label><div class="flex"><input id="c-id" readonly style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-id">Copiar</button></div></div>
-          <div class="field mb"><label>Slug</label><div class="flex"><input id="c-slug" readonly style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-slug">Copiar</button></div></div>
-          <div class="field"><label>Base URL</label><div class="flex"><input id="c-url" value="https://api.ofertatop.com.br/api/v1" readonly style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-url">Copiar</button></div></div>
+          <div class="card-hd">Credenciais da loja</div>
+          <div class="field mb"><label>Store ID</label><div class="flex"><input id="c-id" readonly style="background:#f6f8fa;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-id">Copiar</button></div></div>
+          <div class="field mb"><label>Slug</label><div class="flex"><input id="c-slug" readonly style="background:#f6f8fa;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-slug">Copiar</button></div></div>
+          <div class="field"><label>Base URL</label><div class="flex"><input id="c-url" value="https://api.ofertatop.com.br/api/v1" readonly style="background:#f6f8fa;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-url">Copiar</button></div></div>
         </div>
         <div class="card">
-          <div class="card-hd">📋 Próximos passos</div>
+          <div class="card-hd">Próximos passos</div>
           <div style="display:flex;flex-direction:column;gap:10px">
             <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</span><span>Gere um <b>Token ERP</b> na aba Tokens ERP</span></div>
             <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span><span>Copie o bloco <b>.env</b> na aba Variáveis .env</span></div>
@@ -199,7 +219,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="pg-title">Tokens ERP</div>
         <div class="pg-sub">Gere tokens de integração para autenticar seu ERP na API</div>
         <div class="card">
-          <div class="card-hd">➕ Gerar novo token</div>
+          <div class="card-hd">Gerar novo token</div>
           <div class="fr">
             <div class="field"><label>Nome do token</label><input id="tk-name" placeholder="Ex: ERP Principal"></div>
             <div class="field" style="max-width:150px"><label>Expira em (dias)</label><input id="tk-days" type="number" value="365"></div>
@@ -208,7 +228,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <div id="tk-result" style="display:none">
             <div class="sm muted mb">✓ Token gerado — copie agora</div>
             <div class="token-val" id="tk-val"></div>
-            <div class="flex"><button class="btn btn-ghost btn-sm" id="btn-cp-token">📋 Copiar token</button><span class="sm muted" id="tk-expires"></span></div>
+            <div class="flex"><button class="btn btn-ghost btn-sm" id="btn-cp-token">Copiar token</button><span class="sm muted" id="tk-expires"></span></div>
           </div>
         </div>
         <div class="card">
@@ -220,7 +240,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="pg-title">Webhook</div>
         <div class="pg-sub">Configure a URL do seu ERP para receber eventos em tempo real</div>
         <div class="card">
-          <div class="card-hd">⚙ URL do webhook</div>
+          <div class="card-hd">URL do webhook</div>
           <div class="fr">
             <div class="field"><label>URL do endpoint no seu ERP</label><input id="wh-url" type="url" placeholder="https://seu-erp.com/api/webhook/lojapi"></div>
             <button class="btn btn-primary" id="btn-save-wh">Salvar</button>
@@ -228,7 +248,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
           </div>
           <div id="wh-current" class="sm muted"></div>
         </div>
-        <div class="card"><div class="card-hd">📡 Eventos disponíveis</div><div id="events-grid" class="grid2"></div></div>
+        <div class="card"><div class="card-hd">Eventos disponíveis</div><div id="events-grid" class="grid2"></div></div>
         <div class="card">
           <div class="fb mb"><div class="card-hd" style="margin-bottom:0">Logs recentes</div><button class="btn btn-ghost btn-sm" id="btn-reload-logs">↻ Atualizar</button></div>
           <div class="tw"><table><thead><tr><th>Evento</th><th>Status HTTP</th><th>Resposta</th><th>Data</th></tr></thead><tbody id="logs-tb"><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody></table></div>
@@ -238,7 +258,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="pg-title">Variáveis de Ambiente</div>
         <div class="pg-sub">Copie e cole no <code style="color:var(--accent2)">.env</code> do seu ERP</div>
         <div class="card">
-          <div class="fb mb"><div class="card-hd" style="margin-bottom:0">Bloco .env</div><button class="btn btn-primary btn-sm" id="btn-cp-env">📋 Copiar tudo</button></div>
+          <div class="fb mb"><div class="card-hd" style="margin-bottom:0">Bloco .env</div><button class="btn btn-primary btn-sm" id="btn-cp-env">Copiar tudo</button></div>
           <div class="env-block" id="env-block">Gere um token primeiro para ver as variáveis.</div>
         </div>
         <div class="card">
@@ -255,12 +275,12 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="pg-title">Produtos</div>
         <div class="pg-sub">Consulte o catálogo — gerencie pelo seu ERP via API</div>
         <div class="card">
-          <div class="fb mb"><input id="prod-q" placeholder="Buscar nome ou SKU..." style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);width:240px"><button class="btn btn-ghost btn-sm" id="btn-reload-prods">↻ Atualizar</button></div>
+          <div class="fb mb"><input id="prod-q" placeholder="Buscar nome ou SKU..." style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);width:240px"><button class="btn btn-ghost btn-sm" id="btn-reload-prods">↻ Atualizar</button></div>
           <div class="tw"><table><thead><tr><th>Nome</th><th>SKU</th><th>Preço</th><th>Estoque</th><th>Status</th></tr></thead><tbody id="prods-tb"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table></div>
           <div id="prods-pg" class="flex mt" style="justify-content:flex-end;gap:8px"></div>
         </div>
         <div class="card">
-          <div class="card-hd">⚡ Atualizar estoque rápido</div>
+          <div class="card-hd">Atualizar estoque rápido</div>
           <div class="fr">
             <div class="field"><label>ID do produto</label><input id="sk-id" placeholder="uuid"></div>
             <div class="field" style="max-width:110px"><label>Quantidade</label><input id="sk-qty" type="number" value="1"></div>
@@ -274,8 +294,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="pg-sub">Consulte e atualize status — pedidos chegam via webhook</div>
         <div class="card">
           <div class="flex mb" style="flex-wrap:wrap;gap:8px">
-            <select id="ord-st" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text)"><option value="">Todos os status</option><option>PENDING</option><option>CONFIRMED</option><option>PROCESSING</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
-            <select id="ord-pay" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text)"><option value="">Todos os pagamentos</option><option>PENDING</option><option>PAID</option><option>FAILED</option></select>
+            <select id="ord-st" style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input)"><option value="">Todos os status</option><option>PENDING</option><option>CONFIRMED</option><option>PROCESSING</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
+            <select id="ord-pay" style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input)"><option value="">Todos os pagamentos</option><option>PENDING</option><option>PAID</option><option>FAILED</option></select>
             <button class="btn btn-ghost btn-sm" id="btn-reload-ords">↻ Atualizar</button>
           </div>
           <div class="tw"><table><thead><tr><th>Nº</th><th>Cliente</th><th>Total</th><th>Status</th><th>Pagamento</th><th>Data</th><th>Ação</th></tr></thead><tbody id="ords-tb"><tr><td colspan="7" class="empty">Carregando...</td></tr></tbody></table></div>
@@ -286,7 +306,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="pg-title">Clientes</div>
         <div class="pg-sub">Base de clientes da loja</div>
         <div class="card">
-          <div class="fb mb"><input id="cust-q" placeholder="Buscar nome, email ou documento..." style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);width:300px"><button class="btn btn-ghost btn-sm" id="btn-reload-custs">↻ Atualizar</button></div>
+          <div class="fb mb"><input id="cust-q" placeholder="Buscar nome, email ou documento..." style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);width:300px"><button class="btn btn-ghost btn-sm" id="btn-reload-custs">↻ Atualizar</button></div>
           <div class="tw"><table><thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Pedidos</th><th>Status</th></tr></thead><tbody id="custs-tb"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table></div>
         </div>
       </div>
