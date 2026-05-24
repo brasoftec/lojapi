@@ -11,11 +11,6 @@ import { notFound } from './middlewares/notFound';
 const app = express();
 
 // ─── Segurança ────────────────────────────────────────────────────────────────
-// CSP permissivo para o portal /dev (inline scripts e handlers necessários)
-app.use('/dev', helmet({
-  contentSecurityPolicy: false,
-}));
-app.use('/favicon.png', helmet({ contentSecurityPolicy: false }));
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
@@ -59,6 +54,10 @@ app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 // ─── Developer Portal ─────────────────────────────────────────────────────────
 app.get('/dev', (_req, res) => {
   res.sendFile('public/dev.html', { root: __dirname });
+});
+app.get('/dev.js', (_req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.sendFile('public/dev.js', { root: __dirname });
 });
 app.get('/favicon.png', (_req, res) => {
   res.sendFile('public/favicon.png', { root: __dirname });
