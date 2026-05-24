@@ -42,8 +42,8 @@ function togglePass() {
     icon.innerHTML = '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="17" cy="15" r="1"/><circle cx="16" cy="16" r="6"/><path d="M2 16S7 6 16 6s14 10 14 10s-5 10-14 10S2 16 2 16"/></g>';
   } else {
     // senha visível → olho FECHADO
-    icon.setAttribute('viewBox','0 0 15 15');
-    icon.innerHTML = '<path fill="currentColor" fill-rule="evenodd" d="M2.497 6.666C3.56 7.848 5.186 9 7.5 9s3.939-1.152 5.003-2.334a9.4 9.4 0 0 0 1.449-2.164l.08-.18l.004-.007v-.001l.464.186l.464.186v.002l-.003.004l-.005.014a3 3 0 0 1-.1.222a10.4 10.4 0 0 1-1.61 2.406a9 9 0 0 1-.598.607l1.706 1.705l-.708.708l-1.774-1.775A7.3 7.3 0 0 1 8 9.984V12H7V9.984A7.3 7.3 0 0 1 3.128 8.58l-1.774 1.775l-.708-.708l1.706-1.705a9 9 0 0 1-.599-.607a10.4 10.4 0 0 1-1.61-2.406a6 6 0 0 1-.099-.222L.04 4.692l-.002-.004v-.001H.035L.5 4.5l.464-.186l.004.008a3 3 0 0 0 .08.18a9.4 9.4 0 0 0 1.449 2.164" clip-rule="evenodd"/>';
+    icon.setAttribute('viewBox','0 0 24 24');
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
   }
 }
 
@@ -55,28 +55,26 @@ var BTN_LOADING = '<span class="btn-spinner"></span>';
 async function doLogin() {
   var email = document.getElementById('login-email').value.trim();
   var pass = document.getElementById('login-pass').value;
-  var slugEl = document.getElementById('login-slug');
-  var slug = slugEl ? slugEl.value.trim() : '';
   document.getElementById('login-err').style.display = 'none';
   if (!email || !pass) { showErr('Preencha email e senha'); return; }
   var btn = document.getElementById('btn-login');
   btn.innerHTML = BTN_LOADING; btn.disabled = true;
   try {
     var saved = localStorage.getItem('lojapi_slug') || '';
-    var derived = email.split('@')[0].replace(/[^a-z0-9]/gi, '-').toLowerCase();
-    var trySlug = slug || saved || derived;
-    var lojaRes = await fetch(BASE + '/auth/loja/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: pass, storeSlug: trySlug })
-    }).then(function(r) { return r.json(); });
-    if (!lojaRes.error) {
-      localStorage.setItem('lojapi_slug', lojaRes.store.slug);
-      S.token = lojaRes.token; S.name = lojaRes.user.name; S.role = lojaRes.user.role;
-      S.storeId = lojaRes.store.id; S.slug = lojaRes.store.slug; S.storeName = lojaRes.store.name;
-      var loja = await fetch(BASE + '/loja', { headers: { 'Authorization': 'Bearer ' + S.token } }).then(function(r) { return r.json(); });
-      S.apiKey = loja.apiKey; S.storeId = loja.id;
-      btn.innerHTML = BTN_DEFAULT; btn.disabled = false;
-      startApp(); return;
+    if (saved) {
+      var lojaRes = await fetch(BASE + '/auth/loja/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: pass, storeSlug: saved })
+      }).then(function(r) { return r.json(); });
+      if (!lojaRes.error) {
+        localStorage.setItem('lojapi_slug', lojaRes.store.slug);
+        S.token = lojaRes.token; S.name = lojaRes.user.name; S.role = lojaRes.user.role;
+        S.storeId = lojaRes.store.id; S.slug = lojaRes.store.slug; S.storeName = lojaRes.store.name;
+        var loja = await fetch(BASE + '/loja', { headers: { 'Authorization': 'Bearer ' + S.token } }).then(function(r) { return r.json(); });
+        S.apiKey = loja.apiKey; S.storeId = loja.id;
+        btn.innerHTML = BTN_DEFAULT; btn.disabled = false;
+        startApp(); return;
+      }
     }
     var adminRes = await fetch(BASE + '/auth/admin/login', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -87,9 +85,7 @@ async function doLogin() {
       btn.innerHTML = BTN_DEFAULT; btn.disabled = false;
       startApp(); return;
     }
-    document.getElementById('slug-field').style.display = 'block';
-    document.getElementById('login-slug').focus();
-    showErr('Informe o slug da sua loja no campo acima e tente novamente.');
+    showErr('Email ou senha inválidos');
   } catch(e) { showErr(e.message); }
   btn.innerHTML = BTN_DEFAULT; btn.disabled = false;
 }
@@ -294,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btn-login').addEventListener('click', doLogin);
   document.getElementById('login-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
   document.getElementById('login-email').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
-  document.getElementById('login-slug').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
   document.getElementById('eye-btn').addEventListener('click', togglePass);
   document.getElementById('btn-logout').addEventListener('click', logout);
 
