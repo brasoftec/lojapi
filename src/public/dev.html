@@ -207,12 +207,81 @@ tr:hover td{background:#f8fafc}
           <div class="field"><label>Base URL</label><div class="flex"><input id="c-url" value="https://api.ofertatop.com.br/api/v1" readonly style="background:#f6f8fa;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-url">Copiar</button></div></div>
         </div>
         <div class="card">
-          <div class="card-hd">Próximos passos</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</span><span>Gere um <b>Token ERP</b> na aba Tokens ERP</span></div>
-            <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span><span>Copie o bloco <b>.env</b> na aba Variáveis .env</span></div>
-            <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">3</span><span>Configure a <b>URL do webhook</b> na aba Webhook</span></div>
-            <div class="flex sm"><span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">4</span><span>Use o token no header <code style="color:var(--accent2)">X-API-Key</code> do seu ERP</span></div>
+          <div class="card-hd">Como integrar seu ERP</div>
+          <div style="display:flex;flex-direction:column;gap:0">
+
+            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
+              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">1</span>
+              <div>
+                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Gere um Token ERP</div>
+                <div class="sm muted">Vá em <b>Tokens ERP</b> → clique em <b>Gerar token</b> → copie o token gerado. Ele só aparece uma vez.</div>
+                <div class="code" style="margin-top:8px;font-size:11px">X-API-Key: tk-ot<span style="color:var(--muted)">...sua-chave...</span>bra</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
+              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">2</span>
+              <div>
+                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Configure o .env do ERP</div>
+                <div class="sm muted">Vá em <b>Variáveis .env</b> → copie o bloco pronto e cole no <code style="color:var(--accent2)">.env</code> do seu ERP.</div>
+                <div class="code" style="margin-top:8px;font-size:11px">LOJAPI_BASE_URL=https://api.ofertatop.com.br/api/v1<br>LOJAPI_API_KEY=tk-ot...bra<br>LOJAPI_STORE_ID=uuid-da-loja<br>LOJAPI_STORE_SLUG=slug-da-loja</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
+              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">3</span>
+              <div>
+                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Teste a conexão</div>
+                <div class="sm muted">Confirme que o token está funcionando consultando os dados da loja.</div>
+                <div class="code" style="margin-top:8px;font-size:11px">curl https://api.ofertatop.com.br/api/v1/loja \<br>&nbsp;&nbsp;-H "X-API-Key: $LOJAPI_API_KEY"</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
+              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">4</span>
+              <div>
+                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Configure o Webhook</div>
+                <div class="sm muted">Vá em <b>Webhook</b> → informe a URL do endpoint no seu ERP → salve → clique em <b>Testar</b>. Seu ERP deve responder <code style="color:var(--accent2)">HTTP 200</code>.</div>
+                <div class="code" style="margin-top:8px;font-size:11px">POST /webhook/configurar<br>{"webhookUrl": "https://seu-erp.com/api/webhook/lojapi"}</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
+              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">5</span>
+              <div>
+                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Sincronize o catálogo</div>
+                <div class="sm muted">Envie os produtos do ERP para a loja via <code style="color:var(--accent2)">POST /produtos</code>. Use <code style="color:var(--accent2)">PATCH /produtos/:id/estoque</code> para atualizar estoque.</div>
+                <div class="code" style="margin-top:8px;font-size:11px">POST /api/v1/produtos<br>{"name":"Produto","price":99.90,"sku":"SKU-001","stock":50}</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
+              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">6</span>
+              <div>
+                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Receba pedidos via Webhook</div>
+                <div class="sm muted">Quando um pedido for criado na loja, seu ERP recebe o evento <code style="color:var(--accent2)">order.created</code> automaticamente com todos os dados.</div>
+                <div class="code" style="margin-top:8px;font-size:11px">{"event":"order.created","data":{"orderNumber":"#000001","total":199.90,"customer":{...},"items":[...]}}</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
+              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">7</span>
+              <div>
+                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Atualize status dos pedidos</div>
+                <div class="sm muted">Conforme o ERP processa, atualize o status. Fluxo: <code style="color:var(--accent2)">PENDING → CONFIRMED → PROCESSING → SHIPPED → DELIVERED</code></div>
+                <div class="code" style="margin-top:8px;font-size:11px">PATCH /api/v1/pedidos/:id/status<br>{"status":"SHIPPED"}<br><br>PATCH /api/v1/pedidos/:id/pagamento<br>{"paymentStatus":"PAID","paymentMethod":"pix"}</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:14px;padding:14px 0">
+              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">8</span>
+              <div>
+                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Múltiplas lojas</div>
+                <div class="sm muted">Cada loja tem seu próprio token. Para gerenciar várias lojas no mesmo ERP, use um token diferente por loja e identifique pelo <code style="color:var(--accent2)">LOJAPI_STORE_ID</code>.</div>
+                <div class="code" style="margin-top:8px;font-size:11px"># Loja A<br>LOJA_A_API_KEY=tk-ot...bra<br>LOJA_A_STORE_ID=uuid-loja-a<br><br># Loja B<br>LOJA_B_API_KEY=tk-ot...bra<br>LOJA_B_STORE_ID=uuid-loja-b</div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
