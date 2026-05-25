@@ -277,3 +277,6 @@ spec.paths['/api/v1/produtos/{id}/estoque'] = {
     responses: { 200: { description: 'Estoque atualizado' } },
   },
 };
+
+export const swaggerSpec = spec;
+export { swaggerUi };

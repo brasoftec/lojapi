@@ -55,11 +55,23 @@ function badge(s) {
 // Retorna true se o usuário logado é admin global
 function isAdmin() { return S.role === 'SUPER_ADMIN' || S.role === 'ADMIN'; }
 
-// Para admin, usa sempre Bearer token; para loja, usa apiKey se disponível
+// Rotas globais de admin usam Bearer; rotas escopadas à loja preferem X-API-Key
+function isAdminRoute(path) {
+  return path.indexOf('/admin/') === 0
+      || path.indexOf('/admin') === 0
+      || path.indexOf('/cadastrar') === 0
+      || path.indexOf('/auth/') === 0;
+}
+
 async function req(method, path, body) {
   var h = { 'Content-Type': 'application/json' };
-  if (!isAdmin() && S.apiKey) h['X-API-Key'] = S.apiKey;
-  else if (S.token) h['Authorization'] = 'Bearer ' + S.token;
+  if (isAdminRoute(path)) {
+    if (S.token) h['Authorization'] = 'Bearer ' + S.token;
+  } else if (S.apiKey) {
+    h['X-API-Key'] = S.apiKey;
+  } else if (S.token) {
+    h['Authorization'] = 'Bearer ' + S.token;
+  }
   var r = await fetch(BASE + path, { method: method, headers: h, body: body ? JSON.stringify(body) : undefined });
   var d = await r.json().catch(function() { return {}; });
   if (!r.ok) throw new Error(d.error || 'Erro ' + r.status);
@@ -134,9 +146,7 @@ function startApp() {
   document.getElementById('store-badge').textContent = S.storeName || '—';
   document.getElementById('user-name').textContent = S.name || '—';
   document.getElementById('user-role').textContent = S.role || '—';
-  // Mostra seção admin no sidebar apenas para admins
   if (isAdmin()) {
-    document.getElementById('nav-sec-admin').style.display = 'block';
     loadAdminContext();
   } else {
     loadOverview(); loadTokens(); loadWh(); loadEnv(); loadEvents();
@@ -194,7 +204,7 @@ function goTo(btn, page) {
   document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
   document.getElementById('page-' + page).classList.add('active');
   btn.classList.add('active');
-  var fn = { products: loadProds, orders: loadOrds, customers: loadCusts, stores: loadStores, 'store-tokens': loadStoreSelectOptions };
+  var fn = { products: loadProds, orders: loadOrds, customers: loadCusts };
   if (fn[page]) fn[page]();
 }
 

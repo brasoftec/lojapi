@@ -168,6 +168,12 @@ export const authenticateStore = async (req: Request, res: Response, next: NextF
           });
           if (store) req.store = store;
         }
+        // Rota escopada à loja sem storeId: admin precisa fornecer X-API-Key
+        if (!req.store) {
+          return res.status(400).json({
+            error: 'Esta rota é escopada a uma loja. Forneça X-API-Key da loja ou acesse via /:storeId.',
+          });
+        }
         return next();
       }
 
