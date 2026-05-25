@@ -134,7 +134,9 @@ function startApp() {
   document.getElementById('store-badge').textContent = S.storeName || '—';
   document.getElementById('user-name').textContent = S.name || '—';
   document.getElementById('user-role').textContent = S.role || '—';
+  // Mostra seção admin no sidebar apenas para admins
   if (isAdmin()) {
+    document.getElementById('nav-sec-admin').style.display = 'block';
     loadAdminContext();
   } else {
     loadOverview(); loadTokens(); loadWh(); loadEnv(); loadEvents();
@@ -192,7 +194,7 @@ function goTo(btn, page) {
   document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
   document.getElementById('page-' + page).classList.add('active');
   btn.classList.add('active');
-  var fn = { products: loadProds, orders: loadOrds, customers: loadCusts };
+  var fn = { products: loadProds, orders: loadOrds, customers: loadCusts, stores: loadStores, 'store-tokens': loadStoreSelectOptions };
   if (fn[page]) fn[page]();
 }
 
@@ -359,6 +361,169 @@ async function loadCusts() {
   } catch(e) { toast(e.message, 'err'); }
 }
 
+// ── ADMIN: Lojas ──────────────────────────────────────────────────────────
+var storesPage = 1;
+async function loadStores() {
+  var q = document.getElementById('stores-q').value;
+  var plan = document.getElementById('stores-plan-filter').value;
+  try {
+    var url = '/admin/lojas?page=' + storesPage + '&limit=20';
+    if (q) url += '&search=' + encodeURIComponent(q);
+    if (plan) url += '&plan=' + plan;
+    var d = await req('GET', url);
+    var tb = document.getElementById('stores-tb');
+    if (!d.data || !d.data.length) { tb.innerHTML = '<tr><td colspan="9" class="empty">Nenhuma loja</td></tr>'; return; }
+    tb.innerHTML = d.data.map(function(s) {
+      var statusBadge = s.active ? '<span class="badge bg">ativa</span>' : '<span class="badge br">inativa</span>';
+      var planBadge = '<span class="badge bb">' + s.plan + '</span>';
+      var apiKeyShort = s.apiKey ? s.apiKey.substring(0,8) + '...' : '—';
+      return '<tr>' +
+        '<td><b>' + s.name + '</b></td>' +
+        '<td class="muted sm">' + s.slug + '</td>' +
+        '<td class="muted sm">' + s.email + '</td>' +
+        '<td>' + planBadge + '</td>' +
+        '<td class="muted sm">' + (s._count ? s._count.products : 0) + '</td>' +
+        '<td class="muted sm">' + (s._count ? s._count.orders : 0) + '</td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td><code style="font-size:11px;color:var(--accent2)">' + apiKeyShort + '</code> <button class="btn btn-ghost btn-sm regen-key-btn" data-id="' + s.id + '" data-name="' + s.name + '">Regenerar</button></td>' +
+        '<td><div class="flex" style="gap:4px">' +
+          '<select class="plan-sel" data-id="' + s.id + '" style="background:#fff;border:1.5px solid var(--border-input);border-radius:8px;padding:3px 6px;color:var(--text-input);font-size:11px"><option value="">Plano...</option><option>FREE</option><option>BASIC</option><option>PRO</option><option>ENTERPRISE</option></select>' +
+          '<button class="btn btn-sm ' + (s.active ? 'btn-danger' : 'btn-ghost') + ' toggle-store-btn" data-id="' + s.id + '" data-active="' + s.active + '">' + (s.active ? 'Desativar' : 'Ativar') + '</button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('');
+    // Bind eventos
+    document.querySelectorAll('.regen-key-btn').forEach(function(b) {
+      b.addEventListener('click', function() { regenApiKey(b.dataset.id, b.dataset.name); });
+    });
+    document.querySelectorAll('.toggle-store-btn').forEach(function(b) {
+      b.addEventListener('click', function() { toggleStore(b.dataset.id, b.dataset.active === 'true'); });
+    });
+    document.querySelectorAll('.plan-sel').forEach(function(sel) {
+      sel.addEventListener('change', function() { if (sel.value) updatePlan(sel.dataset.id, sel.value); });
+    });
+    // Paginação
+    var pg = d.pagination;
+    var el = document.getElementById('stores-pg');
+    el.innerHTML = '<span class="sm muted">' + pg.total + ' lojas</span>';
+    if (pg.page > 1) { var pb = document.createElement('button'); pb.className = 'btn btn-ghost btn-sm'; pb.textContent = '← Anterior'; pb.addEventListener('click', function() { storesPage--; loadStores(); }); el.appendChild(pb); }
+    if (pg.page < pg.totalPages) { var nb = document.createElement('button'); nb.className = 'btn btn-ghost btn-sm'; nb.textContent = 'Próxima →'; nb.addEventListener('click', function() { storesPage++; loadStores(); }); el.appendChild(nb); }
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function createStore() {
+  var name = document.getElementById('ns-name').value.trim();
+  var email = document.getElementById('ns-email').value.trim();
+  var ownerName = document.getElementById('ns-owner-name').value.trim();
+  var ownerEmail = document.getElementById('ns-owner-email').value.trim();
+  var ownerPass = document.getElementById('ns-owner-pass').value;
+  var plan = document.getElementById('ns-plan').value;
+  if (!name || !email || !ownerName || !ownerEmail || !ownerPass) { toast('Preencha todos os campos', 'err'); return; }
+  try {
+    var d = await req('POST', '/cadastrar', { name, email, ownerName, ownerEmail, ownerPassword: ownerPass, plan });
+    toast('Loja criada: ' + d.store.name);
+    document.getElementById('ns-name').value = '';
+    document.getElementById('ns-email').value = '';
+    document.getElementById('ns-owner-name').value = '';
+    document.getElementById('ns-owner-email').value = '';
+    document.getElementById('ns-owner-pass').value = '';
+    loadStores();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function regenApiKey(id, name) {
+  if (!confirm('Regenerar API Key de "' + name + '"? A chave atual será invalidada.')) return;
+  try {
+    var d = await req('POST', '/loja/' + id + '/regenerar-api-key');
+    toast('Nova API Key: ' + d.apiKey.substring(0,12) + '...');
+    loadStores();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function toggleStore(id, isActive) {
+  try {
+    var d = await req('PATCH', '/admin/lojas/' + id + '/status');
+    toast(d.message); loadStores();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function updatePlan(id, plan) {
+  try {
+    await req('PATCH', '/admin/lojas/' + id + '/plano', { plan });
+    toast('Plano atualizado para ' + plan); loadStores();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+// ── ADMIN: Tokens por Loja ────────────────────────────────────────────────
+var stTokenStoreId = null;
+
+async function loadStoreSelectOptions() {
+  try {
+    var d = await req('GET', '/admin/lojas?limit=100');
+    var sel = document.getElementById('st-store-sel');
+    sel.innerHTML = '<option value="">Selecione uma loja...</option>';
+    (d.data || []).forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s.id + '|' + s.apiKey;
+      opt.textContent = s.name + ' (' + s.slug + ')';
+      sel.appendChild(opt);
+    });
+  } catch(e) {}
+}
+
+async function loadStoreTokens() {
+  var val = document.getElementById('st-store-sel').value;
+  if (!val) { toast('Selecione uma loja', 'err'); return; }
+  var parts = val.split('|');
+  stTokenStoreId = parts[0];
+  var storeApiKey = parts[1];
+  document.getElementById('st-tokens-card').style.display = 'block';
+  try {
+    var d = await fetch(BASE + '/tokens', { headers: { 'X-API-Key': storeApiKey } }).then(function(r) { return r.json(); });
+    var tb = document.getElementById('st-tokens-tb');
+    if (!d.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">Nenhum token</td></tr>'; return; }
+    tb.innerHTML = d.map(function(t) {
+      return '<tr>' +
+        '<td><b>' + t.name + '</b></td>' +
+        '<td><code style="font-size:11px;color:var(--accent2)">' + t.token + '</code></td>' +
+        '<td class="muted sm">' + dt(t.createdAt) + '</td>' +
+        '<td>' + (t.expiresAt ? dt(t.expiresAt) : '<span class="badge bm">Nunca</span>') + '</td>' +
+        '<td>' + (t.lastUsedAt ? dt(t.lastUsedAt) : '<span class="muted">—</span>') + '</td>' +
+        '<td>' + (t.active ? '<span class="badge bg">ativo</span>' : '<span class="badge br">revogado</span>') + '</td>' +
+        '<td>' + (t.active ? '<button class="btn btn-danger btn-sm st-revoke-btn" data-id="' + t.id + '" data-key="' + storeApiKey + '">Revogar</button>' : '') + '</td>' +
+      '</tr>';
+    }).join('');
+    document.querySelectorAll('.st-revoke-btn').forEach(function(b) {
+      b.addEventListener('click', function() { revokeStoreToken(b.dataset.id, b.dataset.key); });
+    });
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function genStoreToken() {
+  var val = document.getElementById('st-store-sel').value;
+  if (!val) { toast('Selecione uma loja', 'err'); return; }
+  var storeApiKey = val.split('|')[1];
+  var name = prompt('Nome do token:', 'Token ERP');
+  if (!name) return;
+  try {
+    var d = await fetch(BASE + '/tokens', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': storeApiKey },
+      body: JSON.stringify({ name: name, expiresInDays: 365 })
+    }).then(function(r) { return r.json(); });
+    if (d.error) throw new Error(d.error);
+    toast('Token gerado: ' + d.integration.token.substring(0,16) + '...');
+    loadStoreTokens();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function revokeStoreToken(id, storeApiKey) {
+  if (!confirm('Revogar este token?')) return;
+  try {
+    await fetch(BASE + '/tokens/' + id + '/revogar', { method: 'DELETE', headers: { 'X-API-Key': storeApiKey } });
+    toast('Token revogado'); loadStoreTokens();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
 function bindCpblockBtns() {
   document.querySelectorAll('[data-cpblock]').forEach(function(b) {
     b.addEventListener('click', function() { cpBlock(b.dataset.cpblock); });
@@ -426,4 +591,15 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Clientes
   document.getElementById('cust-q').addEventListener('input', loadCusts);
   document.getElementById('btn-reload-custs').addEventListener('click', loadCusts);
+
+  // Admin: Lojas
+  document.getElementById('btn-create-store').addEventListener('click', createStore);
+  document.getElementById('btn-reload-stores').addEventListener('click', loadStores);
+  document.getElementById('stores-q').addEventListener('input', function() { storesPage = 1; loadStores(); });
+  document.getElementById('stores-plan-filter').addEventListener('change', function() { storesPage = 1; loadStores(); });
+
+  // Admin: Tokens por Loja
+  document.getElementById('btn-load-store-tokens').addEventListener('click', loadStoreTokens);
+  document.getElementById('btn-reload-store-tokens').addEventListener('click', loadStoreTokens);
+  document.getElementById('btn-gen-store-token').addEventListener('click', genStoreToken);
 });
