@@ -98,7 +98,7 @@ Documentação completa: [`docs/API.md`](docs/API.md)
 |----------|--------|
 | Admin | `Authorization: Bearer <token>` |
 | Loja (JWT) | `Authorization: Bearer <token>` |
-| Loja / ERP (API Key) | `X-API-Key: <apiKey ou lojapi_...>` |
+| Loja / ERP (API Key) | `X-API-Key: <apiKey ou tk-ot...bra>` |
 
 ---
 
