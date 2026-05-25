@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Portal do Desenvolvedor</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Portal do Desenvolvedor | API Loja</title>
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="https://font.brasoftec.com.br/fonts/instrument-sans/instrument-sans.css">
 <style>
@@ -18,23 +18,57 @@
 }
 body{background:var(--bg-login);color:var(--text-input);font-family:var(--font);font-size:14px;min-height:100vh}
 button{cursor:pointer;font-family:var(--font)}
-input,select{font-family:var(--font)}
-#loading-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg-login)}
+input,select,textarea{font-family:var(--font)}
+/* ── Controles de formulário (design system) ── */
+#app input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),
+#app select,
+#app textarea,
+#login-screen input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),
+#login-screen select{
+  display:block;width:100%;min-height:40px;box-sizing:border-box;
+  padding:0 12px;font-size:13px;line-height:1.25;color:var(--text-input);
+  background-color:var(--white);border:1.5px solid var(--border-input);border-radius:10px;
+  outline:none;transition:border-color .15s,box-shadow .15s;
+  -webkit-appearance:none;appearance:none;
+}
+#app select,#login-screen select{
+  padding-right:36px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%236b7a8d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:16px;
+}
+#app input::placeholder,#login-screen input::placeholder{color:var(--placeholder)}
+#app input:hover:not(:disabled):not([readonly]),
+#app select:hover:not(:disabled),
+#login-screen input:hover:not(:disabled),
+#login-screen select:hover:not(:disabled){border-color:var(--border2)}
+#app input:focus,#app select:focus,#app textarea:focus,
+#login-screen input:focus,#login-screen select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(45,122,58,.10)}
+#app input:disabled,#app select:disabled,#login-screen input:disabled,#login-screen select:disabled{opacity:.65;cursor:not-allowed;background:#f8fafc}
+#app input[readonly]:not(.cred-input),#login-screen input[readonly]{background:#f8fafc;cursor:default}
+#app input[type=number],#login-screen input[type=number]{-moz-appearance:textfield}
+#app input[type=number]::-webkit-inner-spin-button,#app input[type=number]::-webkit-outer-spin-button,
+#login-screen input[type=number]::-webkit-inner-spin-button,#login-screen input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+#app input[type=search]::-webkit-search-cancel-button,#app input[type=search]::-webkit-search-decoration{-webkit-appearance:none}
+#app .stat-card-actions input,#app .stat-card-actions select{width:auto;min-width:140px;max-width:100%}
+#prod-q{min-width:200px;max-width:280px}
+#cust-q{min-width:200px;max-width:320px}
+#stores-q{min-width:180px;max-width:260px}
+#ord-st,#ord-pay,#stores-plan-filter{min-width:160px;width:auto}
+#loading-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;background:var(--bg-login)}
 .loading-spinner{width:36px;height:36px;border:3px solid var(--border-input);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:var(--bg-login)}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;padding:max(20px,env(safe-area-inset-top)) 20px max(20px,env(safe-area-inset-bottom));background:var(--bg-login)}
 .login-box{background:var(--white);border:1px solid #e1e8ef;border-radius:20px;padding:44px 40px 40px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,.07)}
 .field{margin-bottom:20px}
 .field label{display:block;font-size:14px;font-weight:700;color:var(--text-label);margin-bottom:8px}
-.field input{width:100%;background:var(--white);border:1.5px solid var(--border-input);border-radius:12px;padding:14px 16px;color:var(--text-input);outline:none;transition:.15s;font-size:15px}
-.field input::placeholder{color:var(--placeholder)}
-.field input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(45,122,58,.12)}
-.pass-wrap{position:relative}
-.pass-wrap input{padding-right:46px}
-.eye-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--placeholder);display:flex;align-items:center;padding:0}
+#login-screen .field input{font-size:15px;padding:0 16px;min-height:48px;border-radius:12px}
+.pass-wrap{position:relative;display:block}
+.pass-wrap input{padding-right:52px}
+.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--placeholder);display:flex;align-items:center;justify-content:center;padding:0;min-width:44px;min-height:44px;-webkit-tap-highlight-color:transparent}
 .eye-btn:hover{color:var(--text-input)}
-.btn-login-main{display:flex;align-items:center;justify-content:center;gap:10px;width:60%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:16px 24px;font-size:15px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:.15s;margin-top:8px}
+.btn-login-main{display:flex;align-items:center;justify-content:center;gap:10px;width:60%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:16px 24px;font-size:15px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:.15s;margin-top:8px;-webkit-tap-highlight-color:transparent}
 .btn-login-main:hover{background:var(--green2)}
+.btn-login-main:disabled{opacity:.75;cursor:wait}
 .err-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:10px 14px;color:var(--red);font-size:13px;margin-bottom:16px;display:none}
 .btn-spinner{--sz:18px;width:var(--sz);height:var(--sz);position:relative;display:inline-block;flex-shrink:0}
 .btn-spinner::before,.btn-spinner::after{box-sizing:border-box;position:absolute;content:"";width:calc(var(--sz)*.45);height:calc(var(--sz)*.45);top:50%;left:50%;background:#fff;animation:sp-up 1.2s cubic-bezier(0,0,.24,1.21) infinite}
@@ -43,36 +77,81 @@ input,select{font-family:var(--font)}
 @keyframes sp-up{0%,100%{transform:none}25%{transform:translateX(-100%)}50%{transform:translateX(-100%) translateY(-100%)}75%{transform:translateY(-100%)}}
 #app{display:none;min-height:100vh;flex-direction:column;background:var(--bg)}
 .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.tl{display:flex;align-items:center;gap:14px}
-.topbar-title{font-size:18px;font-weight:700;color:var(--text-label);letter-spacing:-.4px}
-.store-pill{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--muted)}
-.store-pill b{color:var(--text)}
-.tr{display:flex;align-items:center;gap:8px}
-.user-chip{font-size:12px;color:var(--muted);text-align:right}
+.tl{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
+.topbar-title{font-size:18px;font-weight:700;color:var(--text-label);letter-spacing:-.4px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.user-area{display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;line-height:1;box-shadow:0 0 0 3px var(--surface),0 0 0 5px #fff}
+.user-chip{font-size:12px;color:var(--muted);text-align:left}
 .user-chip b{display:block;color:var(--text);font-size:13px}
+.btn-logout-icon{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:.12s;padding:0;flex-shrink:0}
+.btn-logout-icon:hover{border-color:#fca5a5;color:var(--red);background:#fef2f2}
+.btn-logout-icon svg{width:18px;height:18px}
+.sidebar-toggle svg{width:18px;height:18px}
 /* ── Sidebar colapsável ── */
 .layout{display:flex;flex:1}
-.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);padding:14px 10px;flex-shrink:0;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;overflow-x:hidden;transition:width .2s ease}
-.sidebar.collapsed{width:52px;padding:14px 6px}
-.nav-sec{margin-bottom:18px}
-.nav-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:5px;white-space:nowrap;overflow:hidden;transition:opacity .15s}
-.sidebar.collapsed .nav-lbl{opacity:0;height:0;margin:0}
-.sidebar.collapsed .nav-sec{display:flex;flex-direction:column;align-items:center}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;color:var(--muted);cursor:pointer;transition:.12s;font-weight:500;border:none;background:transparent;width:100%;text-align:left;font-size:13px;white-space:nowrap;overflow:hidden}
+.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);padding:10px 8px;flex-shrink:0;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;overflow-x:hidden;transition:width .2s ease}
+.sidebar.collapsed{width:52px;padding:10px 5px}
+.nav-sec{display:flex;flex-direction:column;gap:2px;margin-bottom:5px}
+.nav-sec:last-child{margin-bottom:0}
+.nav-lbl{height:4px;flex-shrink:0}
+.sidebar.collapsed .nav-lbl{height:4px}
+.sidebar.collapsed .nav-sec{align-items:center;gap:2px;margin-bottom:5px}
+.nav-item{display:flex;align-items:center;gap:6px;padding:8px 8px;border-radius:7px;color:var(--muted);cursor:pointer;transition:.12s;font-weight:500;border:none;background:transparent;width:100%;text-align:left;font-size:13px;white-space:nowrap;overflow:hidden;min-height:34px;box-sizing:border-box}
 .nav-item:hover{background:rgba(45,122,58,.07);color:var(--text)}
 .nav-item.active{background:var(--accent);color:#fff}
 .nav-item svg{width:16px;height:16px;flex-shrink:0}
 .nav-item span{transition:opacity .15s,width .15s}
 .sidebar.collapsed .nav-item span{opacity:0;width:0;overflow:hidden}
-.sidebar.collapsed .nav-item{justify-content:center;padding:8px;width:36px;margin:0 auto;border-radius:8px;position:relative;gap:0}
+.sidebar.collapsed .nav-item{justify-content:center;padding:7px 6px;width:34px;min-height:34px;margin:0 auto;border-radius:8px;position:relative;gap:0;box-sizing:border-box}
 .sidebar.collapsed .nav-item:hover::after{content:attr(data-tooltip);position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:var(--text-label);color:#fff;padding:4px 10px;border-radius:6px;font-size:12px;white-space:nowrap;pointer-events:none;z-index:200}/* toggle button */
 .sidebar-toggle{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;flex-shrink:0;transition:.12s}
 .sidebar-toggle:hover{border-color:var(--border2);color:var(--text);background:#f8fafc}
 .main{flex:1;padding:28px;max-width:860px;color:var(--text)}
 .page{display:none}.page.active{display:block}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.card-hd{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px;color:var(--text-label)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+#events-grid.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn-cred--icon{width:32px;min-width:32px;height:32px;min-height:32px;padding:0;gap:0;justify-content:center;border-radius:8px;flex-shrink:0}
+.btn-cred--icon svg{width:16px;height:16px}
+.token-cell{display:flex;align-items:center;gap:8px;min-width:0;max-width:280px}
+.token-cell-val{font-size:11px;color:var(--accent2);font-family:'Courier New',monospace;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-token-copy{white-space:nowrap;vertical-align:middle}
+.event-card{display:flex;align-items:flex-start;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.event-card-icon{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--muted);flex-shrink:0}
+.event-card-icon svg{width:17px;height:17px}
+.event-card-body{min-width:0;flex:1}
+.event-card-title{font-size:12px;color:var(--accent2);font-family:'Courier New',monospace;line-height:1.3;word-break:break-all}
+.event-card-title.is-bold{font-weight:700;color:var(--text-label)}
+.event-card-desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.35}
+.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px}
+@media(min-width:720px){
+  .stats-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+.stat-card{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#f6f8fa;box-shadow:0 1px 3px rgba(15,23,42,.06);margin-bottom:16px}
+.stats-grid>.stat-card{margin-bottom:0}
+.stat-card-hd{display:flex;align-items:center;gap:10px;padding:12px 14px 10px;background:#f6f8fa;border-bottom:none;flex-shrink:0}
+.stat-card-hd-actions{justify-content:space-between;gap:10px;flex-wrap:wrap}
+.stat-card-hd-main{display:flex;align-items:center;gap:10px;min-width:0}
+.stat-card-hd-actions .stat-card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
+.stat-card-icon{display:none;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--muted);flex-shrink:0}
+.stats-grid>.stat-card .stat-card-icon{display:flex}
+.stat-card-icon svg{width:17px;height:17px}
+.stat-card-title{font-size:13px;font-weight:600;color:var(--text-label);letter-spacing:-.2px;line-height:1.2}
+.stat-card-bd{display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:var(--surface);border-top-left-radius:14px;border-top-right-radius:14px;padding:14px 16px 18px;flex:1;width:100%}
+.stat-card-value{width:100%;min-height:34px;display:flex;align-items:flex-end;font-size:30px;font-weight:700;letter-spacing:-1px;color:var(--text-label);line-height:1}
+.stat-card-value.is-text{font-size:22px;letter-spacing:.3px;align-items:flex-end;padding-bottom:1px}
+.stat-card-meta{width:100%;font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
+.stat-card-bd .field{margin-bottom:14px;width:100%}
+.stat-card-bd .field:last-child{margin-bottom:0}
+.stat-card-bd .field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.stat-card-bd .tw,.stat-card-bd .grid2,.stat-card-bd .fr,.stat-card-bd .fb,.stat-card-bd>.flex{width:100%}
+.stat-card-bd .env-block,.stat-card-bd .code{width:100%}
+.cred-row{display:flex;align-items:stretch;gap:8px;width:100%}
+.cred-input{flex:1;min-width:0;width:100%;height:40px;min-height:40px;background:#f6f8fa!important;background-image:none!important;padding:0 12px;font-family:'Courier New',monospace;font-size:12px;overflow-x:auto;cursor:text}
+.btn-cred{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0;height:40px;min-height:40px;box-sizing:border-box;padding:0 14px;border-radius:10px;font-size:12px;font-weight:600;white-space:nowrap}
+.btn-cred svg{width:16px;height:16px;flex-shrink:0}
+.cred-card{width:100%}
+.stat-card-bd .field input.cred-input{font-size:12px;padding:0 12px;min-height:40px;height:40px;width:100%;max-width:none}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
 .stat-v{font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--text-label)}
 .stat-l{font-size:12px;color:var(--muted);margin-top:2px}
@@ -85,11 +164,35 @@ th{background:#f8fafc;padding:9px 14px;text-align:left;font-size:11px;font-weigh
 td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;color:var(--text)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#f8fafc}
-.code{background:#f6f8fa;border:1px solid var(--border);border-radius:10px;padding:13px 15px;font-family:'Courier New',monospace;font-size:12px;color:#0550ae;overflow-x:auto;position:relative;margin:8px 0;line-height:1.6}
+/* VS Code Dark+ — blocos de código / .env */
+.vscode-block{position:relative;background:#1e1e1e;border:1px solid #2d2d2d;border-radius:8px;margin:8px 0;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.22)}
+.vscode-toolbar{display:flex;align-items:center;justify-content:space-between;min-height:32px;padding:4px 8px;background:#252526;border-bottom:1px solid #2d2d2d}
+.vscode-lang-icon{display:flex;align-items:center;justify-content:center;width:28px;height:28px;color:#ccc;flex-shrink:0}
+.vscode-lang-icon svg{width:18px;height:18px;display:block}
+.vscode-block .cpbtn{position:static;flex-shrink:0;background:#2d2d2d;border:1px solid #454545;color:#ccc;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;text-transform:lowercase}
+.vscode-block .cpbtn:hover{background:#3c3c3c;color:#fff;border-color:#569cd6}
+.vscode-block .code-pre{margin:0;padding:12px 16px 14px;overflow:auto;white-space:pre;tab-size:2;-webkit-overflow-scrolling:touch;cursor:grab;scrollbar-width:none;-ms-overflow-style:none;user-select:text}
+.vscode-block .code-pre::-webkit-scrollbar{display:none;width:0;height:0}
+.vscode-block .code-pre.is-dragging{cursor:grabbing;user-select:none}
+.vscode-block code{font-family:'Cascadia Code','Consolas','Courier New',monospace;font-size:13px;line-height:1.55;color:#d4d4d4;display:block;pointer-events:none}
+.tok-comment{color:#6a9955;font-style:italic}
+.tok-keyword{color:#569cd6}
+.tok-string{color:#ce9178}
+.tok-property{color:#9cdcfe}
+.tok-variable{color:#9cdcfe}
+.tok-class{color:#4ec9b0}
+.tok-fn{color:#dcdcaa}
+.tok-flag{color:#c586c0}
+.tok-punct{color:#d4d4d4}
+.tok-muted{color:#858585}
+.tok-number{color:#b5cea8}
+.tok-hex{color:#ce9178}
+.tok-tag{color:#569cd6}
+.tok-attr{color:#9cdcfe}
+.code,.env-block{width:100%}
 .cpbtn{position:absolute;top:8px;right:8px;background:var(--border);border:none;color:var(--muted);padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer}
 .cpbtn:hover{background:var(--border2);color:var(--text)}
 .token-val{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;font-family:'Courier New',monospace;font-size:12px;color:#166534;word-break:break-all;margin:12px 0}
-.env-block{background:#f6f8fa;border:1px solid var(--border);border-radius:10px;padding:14px;font-family:'Courier New',monospace;font-size:12px;color:#166534;line-height:1.8;white-space:pre-wrap;margin:10px 0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 16px;border-radius:10px;border:none;font-weight:600;transition:.15s;white-space:nowrap;font-size:13px;cursor:pointer}
 .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
 .btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ghost:hover{border-color:var(--border2);color:var(--text);background:#f8fafc}
@@ -99,9 +202,8 @@ tr:hover td{background:#f8fafc}
 .fb{display:flex;align-items:center;justify-content:space-between}
 .fr{display:flex;align-items:flex-end;gap:10px;margin-bottom:14px}
 .fr .field{flex:1;margin-bottom:0}
-.fr .field input,.fr .field select,.card .field input,.card .field select{background:var(--white);border:1.5px solid var(--border-input);border-radius:10px;padding:9px 12px;color:var(--text-input);outline:none;transition:.15s;font-size:13px;width:100%}
-.fr .field input:focus,.card .field input:focus,.fr .field select:focus,.card .field select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(45,122,58,.10)}
-.fr .field label,.card .field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.fr .field label,.stat-card-bd .field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.stat-card-bd .field input.cred-input{width:100%;max-width:none}
 .mt{margin-top:14px}.mb{margin-bottom:8px}
 .muted{color:var(--muted)}.sm{font-size:12px}
 .empty{text-align:center;padding:36px;color:var(--muted)}
@@ -111,6 +213,67 @@ tr:hover td{background:#f8fafc}
 #toast.err{border-color:#fca5a5;color:#dc2626}
 .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
 .dot-green{background:#22c55e}.dot-red{background:#ef4444}.dot-yellow{background:#f59e0b}
+.sidebar-overlay{display:none}
+@media(max-width:768px){
+  #login-screen{align-items:center;padding:max(16px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom))}
+  .login-box{max-width:100%;padding:28px 22px 26px;border-radius:16px;box-shadow:0 2px 20px rgba(0,0,0,.08)}
+  .field{margin-bottom:16px}
+  .field label{font-size:13px;margin-bottom:6px}
+  #login-screen .field input{font-size:16px;padding:0 16px;min-height:48px;border-radius:10px}
+  #app input:not(.cred-input),#app select{min-height:44px;font-size:16px}
+  #app .stat-card-actions input,#app .stat-card-actions select{width:100%;min-width:0}
+  #prod-q,#cust-q,#stores-q,#ord-st,#ord-pay,#stores-plan-filter{max-width:none;width:100%}
+  .pass-wrap input{padding-right:52px}
+  .eye-btn{right:4px}
+  .btn-login-main{width:100%;min-height:48px;padding:14px 20px;margin-top:6px;border-radius:10px}
+  .err-box{margin-bottom:14px;font-size:13px;line-height:1.4}
+  .topbar{padding:0 12px;height:52px;gap:8px}
+  .tl{gap:10px;flex:1;min-width:0;overflow:hidden}
+  .topbar-title{display:none}
+  .user-area{gap:8px}
+  .user-chip{display:none}
+  .tr .btn-ghost{padding:6px 10px;font-size:12px}
+  .layout{flex-direction:column}
+  .sidebar-overlay{display:block;position:fixed;inset:52px 0 0;background:rgba(13,33,55,.45);z-index:140;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+  .sidebar-overlay.visible{opacity:1;visibility:visible}
+  .sidebar{position:fixed;top:52px;left:0;bottom:0;width:min(280px,88vw);height:auto;z-index:150;transform:translateX(-100%);transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.12);padding-bottom:env(safe-area-inset-bottom,0)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar.collapsed{width:min(280px,88vw);padding:10px 8px}
+  .sidebar.collapsed .nav-lbl{height:4px}
+  .sidebar.collapsed .nav-sec{gap:2px;margin-bottom:5px}
+  .sidebar.collapsed .nav-item span{opacity:1;width:auto}
+  .sidebar.collapsed .nav-item{justify-content:flex-start;width:100%;padding:8px 8px;min-height:34px}
+  .sidebar.collapsed .nav-item:hover::after{display:none}
+  .main{width:100%;max-width:none;padding:16px 14px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0))}
+  .grid2{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr;gap:10px}
+  .stat-card-value{font-size:26px;min-height:30px}
+  .stat-card-bd{padding:12px 14px 16px;border-top-left-radius:12px;border-top-right-radius:12px}
+  .stat{padding:14px}
+  .stat-v{font-size:22px}
+  .stat-card-hd-actions{align-items:flex-start}
+  .stat-card-hd-actions .stat-card-actions{width:100%;margin-left:0}
+  .cred-input,.btn-cred{height:48px;min-height:48px}
+  .stat-card-bd .cred-input{height:48px;min-height:48px;font-size:13px}
+  .fr{flex-direction:column;align-items:stretch}
+  .fr .field{max-width:none!important;width:100%}
+  .fb{flex-direction:column;align-items:stretch;gap:10px}
+  .flex{flex-wrap:wrap}
+  .tw{-webkit-overflow-scrolling:touch;margin:0 -4px}
+  table{min-width:520px}
+  th,td{padding:9px 10px;font-size:12px}
+  .vscode-block code{font-size:12px}
+  .vscode-block .code-pre{padding:10px 12px 12px}
+  .fr .btn,.stat-card-bd>.btn-primary{align-self:stretch;width:100%;justify-content:center}
+  .fb>.btn,.fb .btn-sm{width:auto;align-self:flex-start}
+  #toast{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0));max-width:none;text-align:center}
+  body.menu-open{overflow:hidden}
+}
+@media(max-width:420px){
+  #login-screen{padding-left:14px;padding-right:14px}
+  .login-box{padding:24px 18px 22px;border-radius:14px}
+  .tl{gap:8px}
+}
 </style>
 </head>
 <body>
@@ -152,263 +315,321 @@ tr:hover td{background:#f8fafc}
 <div id="app">
   <div class="topbar">
     <div class="tl">
-      <button class="sidebar-toggle" id="btn-sidebar-toggle" title="Expandir/recolher menu">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <button class="sidebar-toggle" id="btn-sidebar-toggle" title="Expandir/recolher menu" aria-label="Abrir ou fechar menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.109 20.109C21.5 18.717 21.5 16.479 21.5 12c0-4.478 0-6.718-1.391-8.109S16.479 2.5 12 2.5c-4.478 0-6.718 0-8.109 1.391S2.5 7.521 2.5 12c0 4.478 0 6.718 1.391 8.109S7.521 21.5 12 21.5c4.478 0 6.718 0 8.109-1.391"/><path d="M21.5 9h-19M16 21.5V9"/></g></svg>
       </button>
       <span class="topbar-title">Painel do Desenvolvedor</span>
-      <div class="store-pill">Loja: <b id="store-badge">—</b></div>
     </div>
     <div class="tr">
-      <div class="user-chip"><b id="user-name">—</b><span id="user-role">—</span></div>
-      <button class="btn btn-ghost btn-sm" id="btn-logout">Sair</button>
+      <div class="user-area">
+        <div class="user-avatar" id="user-avatar" aria-hidden="true">—</div>
+        <div class="user-chip"><b id="user-name">—</b><span id="user-role">—</span></div>
+      </div>
+      <button class="btn-logout-icon" id="btn-logout" type="button" title="Sair" aria-label="Sair">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512" aria-hidden="true"><path d="M0 0h512v512H0z" fill="none"/><path fill="currentColor" d="M336 376V272H191a16 16 0 0 1 0-32h145V136a56.06 56.06 0 0 0-56-56H88a56.06 56.06 0 0 0-56 56v240a56.06 56.06 0 0 0 56 56h192a56.06 56.06 0 0 0 56-56m89.37-104l-52.68 52.69a16 16 0 0 0 22.62 22.62l80-80a16 16 0 0 0 0-22.62l-80-80a16 16 0 0 0-22.62 22.62L425.37 240H336v32Z"/></svg>
+      </button>
     </div>
   </div>
   <div class="layout">
+    <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
     <nav class="sidebar" id="sidebar">
       <div class="nav-sec">
-        <div class="nav-lbl">Visão geral</div>
-        <button class="nav-item active" data-page="overview" data-tooltip="Dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Dashboard</span></button>
+        <div class="nav-lbl" aria-hidden="true"></div>
+        <button class="nav-item active" data-page="overview" data-tooltip="Dashboard"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m2 8l9.732-4.866a.6.6 0 0 1 .536 0L22 8m-2 3v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/></svg><span>Dashboard</span></button>
       </div>
       <div class="nav-sec">
-        <div class="nav-lbl">Integração</div>
-        <button class="nav-item" data-page="tokens" data-tooltip="Tokens ERP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg><span>Tokens ERP</span></button>
-        <button class="nav-item" data-page="webhook" data-tooltip="Webhook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>Webhook</span></button>
-        <button class="nav-item" data-page="env" data-tooltip="Variáveis .env"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Variáveis .env</span></button>
+        <div class="nav-lbl" aria-hidden="true"></div>
+        <button class="nav-item" data-page="tokens" data-tooltip="Tokens ERP"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M19.543 4.471A6.501 6.501 0 0 0 8.618 7.255a6.52 6.52 0 0 0 .34 4.447L2.5 18.179V21.5h3.364l-.318-1.99l1.965.33l1.67-1.661l-.318-1.99l1.976.318l1.47-1.472a6.5 6.5 0 0 0 8.06-2.261a6.52 6.52 0 0 0-.838-8.338z"/><path d="M16.99 10.23a2.258 2.258 0 0 1-3.476-2.853a2.26 2.26 0 0 1 3.477-.339a2.275 2.275 0 0 1 0 3.192"/></g></svg><span>Tokens ERP</span></button>
+        <button class="nav-item" data-page="webhook" data-tooltip="Webhook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5.062 13A4 4 0 1 0 11 16.5h6"/><path stroke-linecap="round" stroke-linejoin="round" d="m12 7.5l3.057 5.503a4 4 0 1 1-.557 6.62"/><path d="M12 8.5a1 1 0 1 0 0-2m0 2a1 1 0 1 1 0-2m0 2v-2m-5 11a1 1 0 1 0 0-2m0 2a1 1 0 1 1 0-2m0 2v-2m10 2a1 1 0 1 0 0-2m0 2a1 1 0 1 1 0-2m0 2v-2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 7.5a4 4 0 1 0-5.943 3.497L7 16.5"/></g></svg><span>Webhook</span></button>
+        <button class="nav-item" data-page="env" data-tooltip="Variaveis"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path d="M0 0h16v16H0z" fill="none"/><path fill="currentColor" d="M5.095 2.795C4.37 3.278 4 3.89 4 4.5s.37 1.222 1.095 1.705C5.817 6.686 6.842 7 8 7s2.183-.314 2.905-.795C11.63 5.722 12 5.11 12 4.5s-.37-1.222-1.095-1.705C10.183 2.314 9.158 2 8 2s-2.183.314-2.905.795m-.554-.832C5.448 1.358 6.672 1 8 1s2.552.358 3.46.963C12.362 2.565 13 3.453 13 4.5c0 1.048-.637 1.935-1.54 2.537C10.551 7.642 9.327 8 8 8s-2.552-.358-3.46-.963C3.638 6.435 3 5.547 3 4.5c0-1.048.637-1.935 1.54-2.537m8.312 5.183q-.379.391-.86.713Q12 7.929 12 8c0 .61-.37 1.222-1.095 1.705c-.722.481-1.747.795-2.905.795s-2.183-.314-2.905-.795C4.37 9.222 4 8.61 4 8q0-.07.007-.141a5.3 5.3 0 0 1-.86-.713A2.6 2.6 0 0 0 3 8c0 1.048.637 1.935 1.54 2.537c.908.605 2.132.963 3.46.963s2.552-.358 3.46-.963C12.362 9.935 13 9.047 13 8a2.6 2.6 0 0 0-.147-.854m0 3.5q-.379.391-.86.713q.007.07.007.141c0 .61-.37 1.222-1.095 1.705C10.183 13.686 9.158 14 8 14s-2.183-.314-2.905-.795C4.37 12.722 4 12.11 4 11.5q0-.07.007-.141a5.3 5.3 0 0 1-.86-.713A2.6 2.6 0 0 0 3 11.5c0 1.048.637 1.935 1.54 2.537c.908.605 2.132.963 3.46.963s2.552-.358 3.46-.963c.903-.602 1.54-1.49 1.54-2.537a2.6 2.6 0 0 0-.147-.854"/></svg><span>Variaveis</span></button>
       </div>
       <div class="nav-sec">
-        <div class="nav-lbl">Dados</div>
-        <button class="nav-item" data-page="products" data-tooltip="Produtos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg><span>Produtos</span></button>
-        <button class="nav-item" data-page="orders" data-tooltip="Pedidos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Pedidos</span></button>
-        <button class="nav-item" data-page="customers" data-tooltip="Clientes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Clientes</span></button>
+        <div class="nav-lbl" aria-hidden="true"></div>
+        <button class="nav-item" data-page="products" data-tooltip="Produtos"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" aria-hidden="true"><path d="M0 0h1024v1024H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M464 144c8.837 0 16 7.163 16 16v304c0 8.836-7.163 16-16 16H160c-8.837 0-16-7.164-16-16V160c0-8.837 7.163-16 16-16zm-52 68H212v200h200zm493.333 87.686c6.248 6.248 6.248 16.379 0 22.627l-181.02 181.02c-6.248 6.248-16.378 6.248-22.627 0l-181.019-181.02c-6.248-6.248-6.248-16.379 0-22.627l181.02-181.02c6.248-6.248 16.378-6.248 22.627 0zm-84.853 11.313L713 203.52 605.52 311 713 418.48zM464 544c8.837 0 16 7.164 16 16v304c0 8.837-7.163 16-16 16H160c-8.837 0-16-7.163-16-16V560c0-8.836 7.163-16 16-16zm-52 68H212v200h200zm452-68c8.837 0 16 7.164 16 16v304c0 8.837-7.163 16-16 16H560c-8.837 0-16-7.163-16-16V560c0-8.836 7.163-16 16-16zm-52 68H612v200h200z"/></svg><span>Produtos</span></button>
+        <button class="nav-item" data-page="orders" data-tooltip="Pedidos"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M16.75 11a.75.75 0 0 1-.75.75H8a.75.75 0 0 1 0-1.5h8a.75.75 0 0 1 .75.75"/><path fill="currentColor" fill-rule="evenodd" d="m4.386 8.147l1.188-3.248a2.36 2.36 0 0 1 1.89-1.525a33 33 0 0 1 9.072 0c.864.12 1.59.707 1.89 1.525l1.189 3.248c.222.347.375.743.44 1.17l.101.679a24.7 24.7 0 0 1-.11 8.011a2.664 2.664 0 0 1-2.36 2.182l-1.23.122a45 45 0 0 1-8.912 0l-1.23-.122a2.664 2.664 0 0 1-2.36-2.182a24.7 24.7 0 0 1-.11-8.011l.102-.678a3 3 0 0 1 .44-1.171M7.67 4.86c2.873-.4 5.787-.4 8.66 0a.86.86 0 0 1 .687.555l.506 1.383l-.137-.017l-.978-.097a44.6 44.6 0 0 0-8.816 0l-.978.097q-.07.006-.137.017l.506-1.383a.86.86 0 0 1 .687-.555M5.686 8.9l.018.007l.023-.063c.246-.316.615-.53 1.035-.571l.978-.097a43 43 0 0 1 8.52 0l.978.097c.42.041.789.255 1.035.57l.023.064l.018-.007a1.5 1.5 0 0 1 .257.64l.102.678c.375 2.497.34 5.038-.104 7.524a1.164 1.164 0 0 1-1.03.954l-1.231.122c-2.865.284-5.75.284-8.616 0l-1.23-.122a1.164 1.164 0 0 1-1.031-.954a23.2 23.2 0 0 1-.104-7.524l.102-.678a1.5 1.5 0 0 1 .257-.64" clip-rule="evenodd"/></svg><span>Pedidos</span></button>
+        <button class="nav-item" data-page="customers" data-tooltip="Clientes"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" aria-hidden="true"><path d="M0 0h18v18H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd"><path d="M13.689 11.132c1.155 1.222 1.953 2.879 2.183 4.748a1.007 1.007 0 0 1-1 1.12H3.007a1.005 1.005 0 0 1-1-1.12c.23-1.87 1.028-3.526 2.183-4.748c.247.228.505.442.782.633c-1.038 1.069-1.765 2.55-1.972 4.237L14.872 16c-.204-1.686-.93-3.166-1.966-4.235a7 7 0 0 0 .783-.633M8.939 1c1.9 0 3 2 4.38 2.633a2.48 2.48 0 0 1-1.88.867c-.298 0-.579-.06-.844-.157A3.73 3.73 0 0 1 7.69 5.75c-1.395 0-3.75.25-3.245-1.903C5.94 3 6.952 1 8.94 1"/><path d="M8.94 2c2.205 0 4 1.794 4 4s-1.795 4-4 4c-2.207 0-4-1.794-4-4s1.793-4 4-4m0 9A5 5 0 1 0 8.937.999A5 5 0 0 0 8.94 11"/></g></svg><span>Clientes</span></button>
       </div>
       <div class="nav-sec">
-        <div class="nav-lbl">Links</div>
-        <button class="nav-item" id="nav-swagger" data-tooltip="Documentação"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Documentação</span></button>
-        <button class="nav-item" id="nav-status" data-tooltip="Status API"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Status API</span></button>
+        <div class="nav-lbl" aria-hidden="true"></div>
+        <button class="nav-item" id="nav-swagger" data-tooltip="Documentação"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" aria-hidden="true"><path d="M0 0h256v256H0z" fill="none"/><path fill="currentColor" d="M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16M92.8 145.6a8 8 0 1 1-9.6 12.8l-32-24a8 8 0 0 1 0-12.8l32-24a8 8 0 0 1 9.6 12.8L69.33 128Zm58.89-71.4l-32 112a8 8 0 1 1-15.38-4.4l32-112a8 8 0 0 1 15.38 4.4m53.11 60.2l-32 24a8 8 0 0 1-9.6-12.8l23.47-17.6l-23.47-17.6a8 8 0 1 1 9.6-12.8l32 24a8 8 0 0 1 0 12.8"/></svg><span>Documentação</span></button>
+        <button class="nav-item" id="nav-status" data-tooltip="Status API"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M15.25 2h-6.5A6.76 6.76 0 0 0 2 8.75v6.5A6.75 6.75 0 0 0 8.75 22h6.5A6.75 6.75 0 0 0 22 15.25v-6.5A6.76 6.76 0 0 0 15.25 2m5.25 10.5h-2.94l-2.7 4.52a1 1 0 0 1-.86.48h-.06a1 1 0 0 1-.86-.59L9.87 9.67l-2 3.35a1 1 0 0 1-.86.48h-3.5v-2h2.93l2.71-4.51a1 1 0 0 1 1.77.11l3.22 7.24l2-3.35a1 1 0 0 1 .86-.49h3.5z"/></svg><span>Status API</span></button>
       </div>
     </nav>
     <main class="main">
       <div id="page-overview" class="page active">
-        <div class="grid2" style="margin-bottom:16px">
-          <div class="stat"><div class="stat-v" id="s-products">—</div><div class="stat-l">Produtos</div></div>
-          <div class="stat"><div class="stat-v" id="s-customers">—</div><div class="stat-l">Clientes</div></div>
-          <div class="stat"><div class="stat-v" id="s-orders">—</div><div class="stat-l">Pedidos</div></div>
-          <div class="stat"><div class="stat-v" id="s-plan" style="font-size:17px;margin-top:4px">—</div><div class="stat-l">Plano</div></div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-hd">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><path fill="currentColor" fill-rule="evenodd" d="M464 144c8.837 0 16 7.163 16 16v304c0 8.836-7.163 16-16 16H160c-8.837 0-16-7.164-16-16V160c0-8.837 7.163-16 16-16zm-52 68H212v200h200zm493.333 87.686c6.248 6.248 6.248 16.379 0 22.627l-181.02 181.02c-6.248 6.248-16.378 6.248-22.627 0l-181.019-181.02c-6.248-6.248-6.248-16.379 0-22.627l181.02-181.02c6.248-6.248 16.378-6.248 22.627 0zm-84.853 11.313L713 203.52 605.52 311 713 418.48zM464 544c8.837 0 16 7.164 16 16v304c0 8.837-7.163 16-16 16H160c-8.837 0-16-7.163-16-16V560c0-8.836 7.163-16 16-16zm-52 68H212v200h200zm452-68c8.837 0 16 7.164 16 16v304c0 8.837-7.163 16-16 16H560c-8.837 0-16-7.163-16-16V560c0-8.836 7.163-16 16-16zm-52 68H612v200h200z"/></svg></span>
+              <span class="stat-card-title">Produtos</span>
+            </div>
+            <div class="stat-card-bd">
+              <div class="stat-card-value" id="s-products">—</div>
+              <div class="stat-card-meta">Total na loja</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-hd">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><g fill="currentColor" fill-rule="evenodd"><path d="M13.689 11.132c1.155 1.222 1.953 2.879 2.183 4.748a1.007 1.007 0 0 1-1 1.12H3.007a1.005 1.005 0 0 1-1-1.12c.23-1.87 1.028-3.526 2.183-4.748c.247.228.505.442.782.633c-1.038 1.069-1.765 2.55-1.972 4.237L14.872 16c-.204-1.686-.93-3.166-1.966-4.235a7 7 0 0 0 .783-.633M8.939 1c1.9 0 3 2 4.38 2.633a2.48 2.48 0 0 1-1.88.867c-.298 0-.579-.06-.844-.157A3.73 3.73 0 0 1 7.69 5.75c-1.395 0-3.75.25-3.245-1.903C5.94 3 6.952 1 8.94 1"/><path d="M8.94 2c2.205 0 4 1.794 4 4s-1.795 4-4 4c-2.207 0-4-1.794-4-4s1.793-4 4-4m0 9A5 5 0 1 0 8.937.999A5 5 0 0 0 8.94 11"/></g></svg></span>
+              <span class="stat-card-title">Clientes</span>
+            </div>
+            <div class="stat-card-bd">
+              <div class="stat-card-value" id="s-customers">—</div>
+              <div class="stat-card-meta">Cadastrados</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-hd">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m4.386 8.147l1.188-3.248a2.36 2.36 0 0 1 1.89-1.525a33 33 0 0 1 9.072 0c.864.12 1.59.707 1.89 1.525l1.189 3.248c.222.347.375.743.44 1.17l.101.679a24.7 24.7 0 0 1-.11 8.011a2.664 2.664 0 0 1-2.36 2.182l-1.23.122a45 45 0 0 1-8.912 0l-1.23-.122a2.664 2.664 0 0 1-2.36-2.182a24.7 24.7 0 0 1-.11-8.011l.102-.678a3 3 0 0 1 .44-1.171M7.67 4.86c2.873-.4 5.787-.4 8.66 0a.86.86 0 0 1 .687.555l.506 1.383l-.137-.017l-.978-.097a44.6 44.6 0 0 0-8.816 0l-.978.097q-.07.006-.137.017l.506-1.383a.86.86 0 0 1 .687-.555M5.686 8.9l.018.007l.023-.063c.246-.316.615-.53 1.035-.571l.978-.097a43 43 0 0 1 8.52 0l.978.097c.42.041.789.255 1.035.57l.023.064l.018-.007a1.5 1.5 0 0 1 .257.64l.102.678c.375 2.497.34 5.038-.104 7.524a1.164 1.164 0 0 1-1.03.954l-1.231.122c-2.865.284-5.75.284-8.616 0l-1.23-.122a1.164 1.164 0 0 1-1.031-.954a23.2 23.2 0 0 1-.104-7.524l.102-.678a1.5 1.5 0 0 1 .257-.64" clip-rule="evenodd"/></svg></span>
+              <span class="stat-card-title">Pedidos</span>
+            </div>
+            <div class="stat-card-bd">
+              <div class="stat-card-value" id="s-orders">—</div>
+              <div class="stat-card-meta">Total recebidos</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-hd">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m2 8l9.732-4.866a.6.6 0 0 1 .536 0L22 8m-2 3v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/></svg></span>
+              <span class="stat-card-title">Plano</span>
+            </div>
+            <div class="stat-card-bd">
+              <div class="stat-card-value is-text" id="s-plan">—</div>
+              <div class="stat-card-meta">Assinatura ativa</div>
+            </div>
+          </div>
         </div>
-        <div class="card">
-          <div class="card-hd">Credenciais da loja</div>
-          <div class="field mb"><label>Store ID</label><div class="flex"><input id="c-id" readonly style="background:#f6f8fa;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-id">Copiar</button></div></div>
-          <div class="field mb"><label>Slug</label><div class="flex"><input id="c-slug" readonly style="background:#f6f8fa;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-slug">Copiar</button></div></div>
-          <div class="field"><label>Base URL</label><div class="flex"><input id="c-url" value="https://api.ofertatop.com.br/api/v1" readonly style="background:#f6f8fa;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);flex:1;font-family:'Courier New',monospace;font-size:12px"><button class="btn btn-ghost btn-sm" data-cp="c-url">Copiar</button></div></div>
-        </div>
-        <div class="card">
-          <div class="card-hd">Como integrar seu ERP</div>
-          <div style="display:flex;flex-direction:column;gap:0">
-
-            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
-              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">1</span>
-              <div>
-                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Gere um Token ERP</div>
-                <div class="sm muted">Vá em <b>Tokens ERP</b> → clique em <b>Gerar token</b> → copie o token gerado. Ele só aparece uma vez.</div>
-                <div class="code" style="margin-top:8px;font-size:11px">X-API-Key: tk-ot<span style="color:var(--muted)">...sua-chave...</span>bra</div>
-              </div>
-            </div>
-
-            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
-              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">2</span>
-              <div>
-                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Configure o .env do ERP</div>
-                <div class="sm muted">Vá em <b>Variáveis .env</b> → copie o bloco pronto e cole no <code style="color:var(--accent2)">.env</code> do seu ERP.</div>
-                <div class="code" style="margin-top:8px;font-size:11px">LOJAPI_BASE_URL=https://api.ofertatop.com.br/api/v1<br>LOJAPI_API_KEY=tk-ot...bra<br>LOJAPI_STORE_ID=uuid-da-loja<br>LOJAPI_STORE_SLUG=slug-da-loja</div>
-              </div>
-            </div>
-
-            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
-              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">3</span>
-              <div>
-                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Teste a conexão</div>
-                <div class="sm muted">Confirme que o token está funcionando consultando os dados da loja.</div>
-                <div class="code" style="margin-top:8px;font-size:11px">curl https://api.ofertatop.com.br/api/v1/loja \<br>&nbsp;&nbsp;-H "X-API-Key: $LOJAPI_API_KEY"</div>
-              </div>
-            </div>
-
-            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
-              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">4</span>
-              <div>
-                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Configure o Webhook</div>
-                <div class="sm muted">Vá em <b>Webhook</b> → informe a URL do endpoint no seu ERP → salve → clique em <b>Testar</b>. Seu ERP deve responder <code style="color:var(--accent2)">HTTP 200</code>.</div>
-                <div class="code" style="margin-top:8px;font-size:11px">POST /webhook/configurar<br>{"webhookUrl": "https://seu-erp.com/api/webhook/lojapi"}</div>
-              </div>
-            </div>
-
-            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
-              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">5</span>
-              <div>
-                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Sincronize o catálogo</div>
-                <div class="sm muted">Envie os produtos do ERP para a loja via <code style="color:var(--accent2)">POST /produtos</code>. Use <code style="color:var(--accent2)">PATCH /produtos/:id/estoque</code> para atualizar estoque.</div>
-                <div class="code" style="margin-top:8px;font-size:11px">POST /api/v1/produtos<br>{"name":"Produto","price":99.90,"sku":"SKU-001","stock":50}</div>
-              </div>
-            </div>
-
-            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
-              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">6</span>
-              <div>
-                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Receba pedidos via Webhook</div>
-                <div class="sm muted">Quando um pedido for criado na loja, seu ERP recebe o evento <code style="color:var(--accent2)">order.created</code> automaticamente com todos os dados.</div>
-                <div class="code" style="margin-top:8px;font-size:11px">{"event":"order.created","data":{"orderNumber":"#000001","total":199.90,"customer":{...},"items":[...]}}</div>
-              </div>
-            </div>
-
-            <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)">
-              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">7</span>
-              <div>
-                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Atualize status dos pedidos</div>
-                <div class="sm muted">Conforme o ERP processa, atualize o status. Fluxo: <code style="color:var(--accent2)">PENDING → CONFIRMED → PROCESSING → SHIPPED → DELIVERED</code></div>
-                <div class="code" style="margin-top:8px;font-size:11px">PATCH /api/v1/pedidos/:id/status<br>{"status":"SHIPPED"}<br><br>PATCH /api/v1/pedidos/:id/pagamento<br>{"paymentStatus":"PAID","paymentMethod":"pix"}</div>
-              </div>
-            </div>
-
-            <div style="display:flex;gap:14px;padding:14px 0">
-              <span style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">8</span>
-              <div>
-                <div style="font-weight:700;font-size:13px;color:var(--text-label);margin-bottom:4px">Múltiplas lojas</div>
-                <div class="sm muted">Cada loja tem seu próprio token. Para gerenciar várias lojas no mesmo ERP, use um token diferente por loja e identifique pelo <code style="color:var(--accent2)">LOJAPI_STORE_ID</code>.</div>
-                <div class="code" style="margin-top:8px;font-size:11px"># Loja A<br>LOJA_A_API_KEY=tk-ot...bra<br>LOJA_A_STORE_ID=uuid-loja-a<br><br># Loja B<br>LOJA_B_API_KEY=tk-ot...bra<br>LOJA_B_STORE_ID=uuid-loja-b</div>
-              </div>
-            </div>
-
+        <div class="stat-card cred-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M19.543 4.471A6.501 6.501 0 0 0 8.618 7.255a6.52 6.52 0 0 0 .34 4.447L2.5 18.179V21.5h3.364l-.318-1.99l1.965.33l1.67-1.661l-.318-1.99l1.976.318l1.47-1.472a6.5 6.5 0 0 0 8.06-2.261a6.52 6.52 0 0 0-.838-8.338z"/><path d="M16.99 10.23a2.258 2.258 0 0 1-3.476-2.853a2.26 2.26 0 0 1 3.477-.339a2.275 2.275 0 0 1 0 3.192"/></g></svg></span>
+            <span class="stat-card-title">Credenciais da loja</span>
+          </div>
+          <div class="stat-card-bd">
+            <div class="field"><label for="c-id">Store ID</label><div class="cred-row"><input id="c-id" class="cred-input" readonly><button type="button" class="btn btn-ghost btn-cred" data-cp="c-id" aria-label="Copiar Store ID"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M9 3.25A5.75 5.75 0 0 0 3.25 9v7.107a.75.75 0 0 0 1.5 0V9A4.25 4.25 0 0 1 9 4.75h7.013a.75.75 0 0 0 0-1.5z"/><path fill="currentColor" fill-rule="evenodd" d="M18.403 6.793a44.4 44.4 0 0 0-9.806 0a2.01 2.01 0 0 0-1.774 1.76a42.6 42.6 0 0 0 0 9.894a2.01 2.01 0 0 0 1.774 1.76c3.241.362 6.565.362 9.806 0a2.01 2.01 0 0 0 1.774-1.76a42.6 42.6 0 0 0 0-9.894a2.01 2.01 0 0 0-1.774-1.76M8.764 8.284c3.13-.35 6.342-.35 9.472 0a.51.51 0 0 1 .45.444a41 41 0 0 1 0 9.544a.51.51 0 0 1-.45.444c-3.13.35-6.342.35-9.472 0a.51.51 0 0 1-.45-.444a41 41 0 0 1 0-9.544a.51.51 0 0 1 .45-.444" clip-rule="evenodd"/></svg>Copiar</button></div></div>
+            <div class="field"><label for="c-slug">Slug</label><div class="cred-row"><input id="c-slug" class="cred-input" readonly><button type="button" class="btn btn-ghost btn-cred" data-cp="c-slug" aria-label="Copiar Slug"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M9 3.25A5.75 5.75 0 0 0 3.25 9v7.107a.75.75 0 0 0 1.5 0V9A4.25 4.25 0 0 1 9 4.75h7.013a.75.75 0 0 0 0-1.5z"/><path fill="currentColor" fill-rule="evenodd" d="M18.403 6.793a44.4 44.4 0 0 0-9.806 0a2.01 2.01 0 0 0-1.774 1.76a42.6 42.6 0 0 0 0 9.894a2.01 2.01 0 0 0 1.774 1.76c3.241.362 6.565.362 9.806 0a2.01 2.01 0 0 0 1.774-1.76a42.6 42.6 0 0 0 0-9.894a2.01 2.01 0 0 0-1.774-1.76M8.764 8.284c3.13-.35 6.342-.35 9.472 0a.51.51 0 0 1 .45.444a41 41 0 0 1 0 9.544a.51.51 0 0 1-.45.444c-3.13.35-6.342.35-9.472 0a.51.51 0 0 1-.45-.444a41 41 0 0 1 0-9.544a.51.51 0 0 1 .45-.444" clip-rule="evenodd"/></svg>Copiar</button></div></div>
+            <div class="field"><label for="c-url">Base URL</label><div class="cred-row"><input id="c-url" class="cred-input" value="https://api.ofertatop.com.br/api/v1" readonly><button type="button" class="btn btn-ghost btn-cred" data-cp="c-url" aria-label="Copiar Base URL"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M9 3.25A5.75 5.75 0 0 0 3.25 9v7.107a.75.75 0 0 0 1.5 0V9A4.25 4.25 0 0 1 9 4.75h7.013a.75.75 0 0 0 0-1.5z"/><path fill="currentColor" fill-rule="evenodd" d="M18.403 6.793a44.4 44.4 0 0 0-9.806 0a2.01 2.01 0 0 0-1.774 1.76a42.6 42.6 0 0 0 0 9.894a2.01 2.01 0 0 0 1.774 1.76c3.241.362 6.565.362 9.806 0a2.01 2.01 0 0 0 1.774-1.76a42.6 42.6 0 0 0 0-9.894a2.01 2.01 0 0 0-1.774-1.76M8.764 8.284c3.13-.35 6.342-.35 9.472 0a.51.51 0 0 1 .45.444a41 41 0 0 1 0 9.544a.51.51 0 0 1-.45.444c-3.13.35-6.342.35-9.472 0a.51.51 0 0 1-.45-.444a41 41 0 0 1 0-9.544a.51.51 0 0 1 .45-.444" clip-rule="evenodd"/></svg>Copiar</button></div></div>
           </div>
         </div>
       </div>
       <div id="page-tokens" class="page">
-        <div class="card">
-          <div class="card-hd">Gerar novo token</div>
-          <div class="fr">
-            <div class="field"><label>Nome do token</label><input id="tk-name" placeholder="Ex: ERP Principal"></div>
-            <div class="field" style="max-width:150px"><label>Expira em (dias)</label><input id="tk-days" type="number" value="365"></div>
-            <button class="btn btn-primary" id="btn-gen-token">Gerar token</button>
+        <div class="stat-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M19.543 4.471A6.501 6.501 0 0 0 8.618 7.255a6.52 6.52 0 0 0 .34 4.447L2.5 18.179V21.5h3.364l-.318-1.99l1.965.33l1.67-1.661l-.318-1.99l1.976.318l1.47-1.472a6.5 6.5 0 0 0 8.06-2.261a6.52 6.52 0 0 0-.838-8.338z"/><path d="M16.99 10.23a2.258 2.258 0 0 1-3.476-2.853a2.26 2.26 0 0 1 3.477-.339a2.275 2.275 0 0 1 0 3.192"/></g></svg></span>
+            <span class="stat-card-title">Gerar novo token</span>
           </div>
-          <div id="tk-result" style="display:none">
-            <div class="sm muted mb">✓ Token gerado — copie agora</div>
-            <div class="token-val" id="tk-val"></div>
-            <div class="flex"><button class="btn btn-ghost btn-sm" id="btn-cp-token">Copiar token</button><span class="sm muted" id="tk-expires"></span></div>
+          <div class="stat-card-bd">
+            <div class="fr">
+              <div class="field"><label>Nome do token</label><input id="tk-name" placeholder="Ex: ERP Principal"></div>
+              <div class="field" style="max-width:180px"><label for="tk-days">Expira em</label><select id="tk-days"><option value="7">7 dias</option><option value="30">30 dias</option><option value="90">90 dias</option><option value="180">180 dias</option><option value="365" selected>1 ano (365 dias)</option><option value="">Sem expiração</option></select></div>
+              <button class="btn btn-primary" id="btn-gen-token">Gerar token</button>
+            </div>
+            <div id="tk-result" style="display:none">
+              <div class="sm muted mb">✓ Token gerado — copie agora</div>
+              <div class="token-val" id="tk-val"></div>
+              <div class="flex"><button class="btn btn-ghost btn-sm" id="btn-cp-token">Copiar token</button><span class="sm muted" id="tk-expires"></span></div>
+            </div>
           </div>
         </div>
-        <div class="card">
-          <div class="fb mb"><div class="card-hd" style="margin-bottom:0">Tokens ativos</div><button class="btn btn-ghost btn-sm" id="btn-reload-tokens">↻ Atualizar</button></div>
-          <div class="tw"><table><thead><tr><th>Nome</th><th>Token</th><th>Criado</th><th>Expira</th><th>Último uso</th><th></th></tr></thead><tbody id="tokens-tb"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody></table></div>
+        <div class="stat-card">
+          <div class="stat-card-hd stat-card-hd-actions">
+            <div class="stat-card-hd-main">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>
+              <span class="stat-card-title">Tokens ativos</span>
+            </div>
+            <div class="stat-card-actions"><button class="btn btn-ghost btn-sm" id="btn-reload-tokens">↻ Atualizar</button></div>
+          </div>
+          <div class="stat-card-bd">
+            <div class="tw"><table><thead><tr><th>Nome</th><th>Token</th><th>Criado</th><th>Expira</th><th>Último uso</th><th></th></tr></thead><tbody id="tokens-tb"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody></table></div>
+          </div>
         </div>
       </div>
       <div id="page-webhook" class="page">
-        <div class="card">
-          <div class="card-hd">URL do webhook</div>
-          <div class="fr">
-            <div class="field"><label>URL do endpoint no seu ERP</label><input id="wh-url" type="url" placeholder="https://seu-erp.com/api/webhook/lojapi"></div>
-            <button class="btn btn-primary" id="btn-save-wh">Salvar</button>
-            <button class="btn btn-ghost" id="btn-test-wh">Testar</button>
+        <div class="stat-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5.062 13A4 4 0 1 0 11 16.5h6"/><path stroke-linecap="round" stroke-linejoin="round" d="m12 7.5l3.057 5.503a4 4 0 1 1-.557 6.62"/><path d="M12 8.5a1 1 0 1 0 0-2m0 2a1 1 0 1 1 0-2m0 2v-2m-5 11a1 1 0 1 0 0-2m0 2a1 1 0 1 1 0-2m0 2v-2m10 2a1 1 0 1 0 0-2m0 2a1 1 0 1 1 0-2m0 2v-2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 7.5a4 4 0 1 0-5.943 3.497L7 16.5"/></g></svg></span>
+            <span class="stat-card-title">URL do webhook</span>
           </div>
-          <div id="wh-current" class="sm muted"></div>
+          <div class="stat-card-bd">
+            <div class="fr">
+              <div class="field"><label>URL do endpoint no seu ERP</label><input id="wh-url" type="url" placeholder="https://seu-erp.com/api/webhook/lojapi"></div>
+              <button class="btn btn-primary" id="btn-save-wh">Salvar</button>
+              <button class="btn btn-ghost" id="btn-test-wh">Testar</button>
+            </div>
+            <div id="wh-current" class="sm muted"></div>
+          </div>
         </div>
-        <div class="card"><div class="card-hd">Eventos disponíveis</div><div id="events-grid" class="grid2"></div></div>
-        <div class="card">
-          <div class="fb mb"><div class="card-hd" style="margin-bottom:0">Logs recentes</div><button class="btn btn-ghost btn-sm" id="btn-reload-logs">↻ Atualizar</button></div>
-          <div class="tw"><table><thead><tr><th>Evento</th><th>Status HTTP</th><th>Resposta</th><th>Data</th></tr></thead><tbody id="logs-tb"><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody></table></div>
+        <div class="stat-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></span>
+            <span class="stat-card-title">Eventos disponíveis</span>
+          </div>
+          <div class="stat-card-bd"><div id="events-grid" class="grid2"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-hd stat-card-hd-actions">
+            <div class="stat-card-hd-main">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/></svg></span>
+              <span class="stat-card-title">Logs recentes</span>
+            </div>
+            <div class="stat-card-actions"><button class="btn btn-ghost btn-sm" id="btn-reload-logs">↻ Atualizar</button></div>
+          </div>
+          <div class="stat-card-bd">
+            <div class="tw"><table><thead><tr><th>Evento</th><th>Status HTTP</th><th>Resposta</th><th>Data</th></tr></thead><tbody id="logs-tb"><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody></table></div>
+          </div>
         </div>
       </div>
       <div id="page-env" class="page">
-        <div class="card">
-          <div class="fb mb"><div class="card-hd" style="margin-bottom:0">Bloco .env</div><button class="btn btn-primary btn-sm" id="btn-cp-env">Copiar tudo</button></div>
-          <div class="env-block" id="env-block">Gere um token primeiro para ver as variáveis.</div>
+        <div class="stat-card">
+          <div class="stat-card-hd stat-card-hd-actions">
+            <div class="stat-card-hd-main">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill="currentColor" d="M5.095 2.795C4.37 3.278 4 3.89 4 4.5s.37 1.222 1.095 1.705C5.817 6.686 6.842 7 8 7s2.183-.314 2.905-.795C11.63 5.722 12 5.11 12 4.5s-.37-1.222-1.095-1.705C10.183 2.314 9.158 2 8 2s-2.183.314-2.905.795m-.554-.832C5.448 1.358 6.672 1 8 1s2.552.358 3.46.963C12.362 2.565 13 3.453 13 4.5c0 1.048-.637 1.935-1.54 2.537C10.551 7.642 9.327 8 8 8s-2.552-.358-3.46-.963C3.638 6.435 3 5.547 3 4.5c0-1.048.637-1.935 1.54-2.537m8.312 5.183q-.379.391-.86.713Q12 7.929 12 8c0 .61-.37 1.222-1.095 1.705c-.722.481-1.747.795-2.905.795s-2.183-.314-2.905-.795C4.37 9.222 4 8.61 4 8q0-.07.007-.141a5.3 5.3 0 0 1-.86-.713A2.6 2.6 0 0 0 3 8c0 1.048.637 1.935 1.54 2.537c.908.605 2.132.963 3.46.963s2.552-.358 3.46-.963C12.362 9.935 13 9.047 13 8a2.6 2.6 0 0 0-.147-.854m0 3.5q-.379.391-.86.713q.007.07.007.141c0 .61-.37 1.222-1.095 1.705C10.183 13.686 9.158 14 8 14s-2.183-.314-2.905-.795C4.37 12.722 4 12.11 4 11.5q0-.07.007-.141a5.3 5.3 0 0 1-.86-.713A2.6 2.6 0 0 0 3 11.5c0 1.048.637 1.935 1.54 2.537c.908.605 2.132.963 3.46.963s2.552-.358 3.46-.963c.903-.602 1.54-1.49 1.54-2.537a2.6 2.6 0 0 0-.147-.854"/></svg></span>
+              <span class="stat-card-title">Bloco .env</span>
+            </div>
+            <div class="stat-card-actions"><button class="btn btn-primary btn-sm" id="btn-cp-env">Copiar tudo</button></div>
+          </div>
+          <div class="stat-card-bd"><div class="vscode-block env-block" id="env-block" data-vscode-lang="dotenv"></div></div>
         </div>
-        <div class="card">
-          <div class="card-hd">Exemplos de uso no ERP</div>
-          <div class="sm muted mb">Node.js / TypeScript</div>
-          <div class="code" id="ex-node"><button class="cpbtn" data-cpblock="ex-node">copiar</button></div>
-          <div class="sm muted mt mb">PHP (Guzzle)</div>
-          <div class="code" id="ex-php"><button class="cpbtn" data-cpblock="ex-php">copiar</button></div>
-          <div class="sm muted mt mb">cURL</div>
-          <div class="code" id="ex-curl"><button class="cpbtn" data-cpblock="ex-curl">copiar</button></div>
+        <div class="stat-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></span>
+            <span class="stat-card-title">Exemplos de uso no ERP</span>
+          </div>
+          <div class="stat-card-bd">
+            <div class="vscode-block code" id="ex-node" data-vscode-lang="javascript"></div>
+            <div class="vscode-block code" id="ex-php" data-vscode-lang="php"></div>
+            <div class="vscode-block code" id="ex-curl" data-vscode-lang="shell"></div>
+          </div>
         </div>
       </div>
       <div id="page-products" class="page">
-        <div class="card">
-          <div class="fb mb"><input id="prod-q" placeholder="Buscar nome ou SKU..." style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);width:240px"><button class="btn btn-ghost btn-sm" id="btn-reload-prods">↻ Atualizar</button></div>
-          <div class="tw"><table><thead><tr><th>Nome</th><th>SKU</th><th>Preço</th><th>Estoque</th><th>Status</th></tr></thead><tbody id="prods-tb"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table></div>
-          <div id="prods-pg" class="flex mt" style="justify-content:flex-end;gap:8px"></div>
+        <div class="stat-card">
+          <div class="stat-card-hd stat-card-hd-actions">
+            <div class="stat-card-hd-main">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><path fill="currentColor" fill-rule="evenodd" d="M464 144c8.837 0 16 7.163 16 16v304c0 8.836-7.163 16-16 16H160c-8.837 0-16-7.164-16-16V160c0-8.837 7.163-16 16-16zm-52 68H212v200h200zm493.333 87.686c6.248 6.248 6.248 16.379 0 22.627l-181.02 181.02c-6.248 6.248-16.378 6.248-22.627 0l-181.019-181.02c-6.248-6.248-6.248-16.379 0-22.627l181.02-181.02c6.248-6.248 16.378-6.248 22.627 0zm-84.853 11.313L713 203.52 605.52 311 713 418.48zM464 544c8.837 0 16 7.164 16 16v304c0 8.837-7.163 16-16 16H160c-8.837 0-16-7.163-16-16V560c0-8.836 7.163-16 16-16zm-52 68H212v200h200zm452-68c8.837 0 16 7.164 16 16v304c0 8.837-7.163 16-16 16H560c-8.837 0-16-7.163-16-16V560c0-8.836 7.163-16 16-16zm-52 68H612v200h200z"/></svg></span>
+              <span class="stat-card-title">Produtos</span>
+            </div>
+            <div class="stat-card-actions"><input id="prod-q" type="search" placeholder="Buscar nome ou SKU..."><button class="btn btn-ghost btn-sm" id="btn-reload-prods">↻ Atualizar</button></div>
+          </div>
+          <div class="stat-card-bd">
+            <div class="tw"><table><thead><tr><th>Nome</th><th>SKU</th><th>Preço</th><th>Estoque</th><th>Status</th></tr></thead><tbody id="prods-tb"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table></div>
+            <div id="prods-pg" class="flex mt" style="justify-content:flex-end;gap:8px"></div>
+          </div>
         </div>
-        <div class="card">
-          <div class="card-hd">Atualizar estoque rápido</div>
-          <div class="fr">
-            <div class="field"><label>ID do produto</label><input id="sk-id" placeholder="uuid"></div>
-            <div class="field" style="max-width:110px"><label>Quantidade</label><input id="sk-qty" type="number" value="1"></div>
-            <div class="field" style="max-width:140px"><label>Operação</label><select id="sk-op"><option value="increment">Adicionar</option><option value="decrement">Subtrair</option><option value="set">Definir</option></select></div>
-            <button class="btn btn-primary" id="btn-upd-stock">Atualizar</button>
+        <div class="stat-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4l-8 4M4 7l8 4M4 7v10l8 4 8-4V7"/></svg></span>
+            <span class="stat-card-title">Atualizar estoque rápido</span>
+          </div>
+          <div class="stat-card-bd">
+            <div class="fr">
+              <div class="field"><label>ID do produto</label><input id="sk-id" placeholder="uuid"></div>
+              <div class="field" style="max-width:110px"><label>Quantidade</label><input id="sk-qty" type="number" value="1"></div>
+              <div class="field" style="max-width:140px"><label>Operação</label><select id="sk-op"><option value="increment">Adicionar</option><option value="decrement">Subtrair</option><option value="set">Definir</option></select></div>
+              <button class="btn btn-primary" id="btn-upd-stock">Atualizar</button>
+            </div>
           </div>
         </div>
       </div>
       <div id="page-orders" class="page">
-        <div class="card">
-          <div class="flex mb" style="flex-wrap:wrap;gap:8px">
-            <select id="ord-st" style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input)"><option value="">Todos os status</option><option>PENDING</option><option>CONFIRMED</option><option>PROCESSING</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
-            <select id="ord-pay" style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input)"><option value="">Todos os pagamentos</option><option>PENDING</option><option>PAID</option><option>FAILED</option></select>
-            <button class="btn btn-ghost btn-sm" id="btn-reload-ords">↻ Atualizar</button>
+        <div class="stat-card">
+          <div class="stat-card-hd stat-card-hd-actions">
+            <div class="stat-card-hd-main">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="m4.386 8.147l1.188-3.248a2.36 2.36 0 0 1 1.89-1.525a33 33 0 0 1 9.072 0c.864.12 1.59.707 1.89 1.525l1.189 3.248c.222.347.375.743.44 1.17l.101.679a24.7 24.7 0 0 1-.11 8.011a2.664 2.664 0 0 1-2.36 2.182l-1.23.122a45 45 0 0 1-8.912 0l-1.23-.122a2.664 2.664 0 0 1-2.36-2.182a24.7 24.7 0 0 1-.11-8.011l.102-.678a3 3 0 0 1 .44-1.171M7.67 4.86c2.873-.4 5.787-.4 8.66 0a.86.86 0 0 1 .687.555l.506 1.383l-.137-.017l-.978-.097a44.6 44.6 0 0 0-8.816 0l-.978.097q-.07.006-.137.017l.506-1.383a.86.86 0 0 1 .687-.555M5.686 8.9l.018.007l.023-.063c.246-.316.615-.53 1.035-.571l.978-.097a43 43 0 0 1 8.52 0l.978.097c.42.041.789.255 1.035.57l.023.064l.018-.007a1.5 1.5 0 0 1 .257.64l.102.678c.375 2.497.34 5.038-.104 7.524a1.164 1.164 0 0 1-1.03.954l-1.231.122c-2.865.284-5.75.284-8.616 0l-1.23-.122a1.164 1.164 0 0 1-1.031-.954a23.2 23.2 0 0 1-.104-7.524l.102-.678a1.5 1.5 0 0 1 .257-.64" clip-rule="evenodd"/></svg></span>
+              <span class="stat-card-title">Pedidos</span>
+            </div>
+            <div class="stat-card-actions">
+              <select id="ord-st"><option value="">Todos os status</option><option>PENDING</option><option>CONFIRMED</option><option>PROCESSING</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
+              <select id="ord-pay"><option value="">Todos os pagamentos</option><option>PENDING</option><option>PAID</option><option>FAILED</option></select>
+              <button class="btn btn-ghost btn-sm" id="btn-reload-ords">↻ Atualizar</button>
+            </div>
           </div>
-          <div class="tw"><table><thead><tr><th>Nº</th><th>Cliente</th><th>Total</th><th>Status</th><th>Pagamento</th><th>Data</th><th>Ação</th></tr></thead><tbody id="ords-tb"><tr><td colspan="7" class="empty">Carregando...</td></tr></tbody></table></div>
-          <div id="ords-pg" class="flex mt" style="justify-content:flex-end;gap:8px"></div>
+          <div class="stat-card-bd">
+            <div class="tw"><table><thead><tr><th>Nº</th><th>Cliente</th><th>Total</th><th>Status</th><th>Pagamento</th><th>Data</th><th>Ação</th></tr></thead><tbody id="ords-tb"><tr><td colspan="7" class="empty">Carregando...</td></tr></tbody></table></div>
+            <div id="ords-pg" class="flex mt" style="justify-content:flex-end;gap:8px"></div>
+          </div>
         </div>
       </div>
       <div id="page-customers" class="page">
-        <div class="card">
-          <div class="fb mb"><input id="cust-q" placeholder="Buscar nome, email ou documento..." style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);width:300px"><button class="btn btn-ghost btn-sm" id="btn-reload-custs">↻ Atualizar</button></div>
-          <div class="tw"><table><thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Pedidos</th><th>Status</th></tr></thead><tbody id="custs-tb"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table></div>
+        <div class="stat-card">
+          <div class="stat-card-hd stat-card-hd-actions">
+            <div class="stat-card-hd-main">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><g fill="currentColor" fill-rule="evenodd"><path d="M13.689 11.132c1.155 1.222 1.953 2.879 2.183 4.748a1.007 1.007 0 0 1-1 1.12H3.007a1.005 1.005 0 0 1-1-1.12c.23-1.87 1.028-3.526 2.183-4.748c.247.228.505.442.782.633c-1.038 1.069-1.765 2.55-1.972 4.237L14.872 16c-.204-1.686-.93-3.166-1.966-4.235a7 7 0 0 0 .783-.633M8.939 1c1.9 0 3 2 4.38 2.633a2.48 2.48 0 0 1-1.88.867c-.298 0-.579-.06-.844-.157A3.73 3.73 0 0 1 7.69 5.75c-1.395 0-3.75.25-3.245-1.903C5.94 3 6.952 1 8.94 1"/><path d="M8.94 2c2.205 0 4 1.794 4 4s-1.795 4-4 4c-2.207 0-4-1.794-4-4s1.793-4 4-4m0 9A5 5 0 1 0 8.937.999A5 5 0 0 0 8.94 11"/></g></svg></span>
+              <span class="stat-card-title">Clientes</span>
+            </div>
+            <div class="stat-card-actions"><input id="cust-q" type="search" placeholder="Buscar nome, email ou documento..."><button class="btn btn-ghost btn-sm" id="btn-reload-custs">↻ Atualizar</button></div>
+          </div>
+          <div class="stat-card-bd">
+            <div class="tw"><table><thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Pedidos</th><th>Status</th></tr></thead><tbody id="custs-tb"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table></div>
+          </div>
         </div>
       </div>
 
       <!-- ── ADMIN: Lojas ── -->
       <div id="page-stores" class="page">
-        <div class="card">
-          <div class="card-hd">Nova loja</div>
-          <div class="grid2" style="gap:10px;margin-bottom:10px">
-            <div class="field" style="margin:0"><label>Nome da loja</label><input id="ns-name" placeholder="Ex: Loja ABC"></div>
-            <div class="field" style="margin:0"><label>Email da loja</label><input id="ns-email" type="email" placeholder="contato@loja.com"></div>
-            <div class="field" style="margin:0"><label>Nome do responsável</label><input id="ns-owner-name" placeholder="João Silva"></div>
-            <div class="field" style="margin:0"><label>Email do responsável</label><input id="ns-owner-email" type="email" placeholder="joao@loja.com"></div>
-            <div class="field" style="margin:0"><label>Senha do responsável</label><input id="ns-owner-pass" type="password" placeholder="Mínimo 8 caracteres"></div>
-            <div class="field" style="margin:0"><label>Plano</label><select id="ns-plan"><option value="FREE">FREE</option><option value="BASIC">BASIC</option><option value="PRO" selected>PRO</option><option value="ENTERPRISE">ENTERPRISE</option></select></div>
+        <div class="stat-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m2 8l9.732-4.866a.6.6 0 0 1 .536 0L22 8m-2 3v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/></svg></span>
+            <span class="stat-card-title">Nova loja</span>
           </div>
-          <button class="btn btn-primary" id="btn-create-store">Criar loja</button>
-        </div>
-        <div class="card">
-          <div class="fb mb">
-            <div class="flex" style="gap:8px">
-              <input id="stores-q" placeholder="Buscar nome, email ou slug..." style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input);width:240px">
-              <select id="stores-plan-filter" style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:8px 12px;color:var(--text-input)"><option value="">Todos os planos</option><option>FREE</option><option>BASIC</option><option>PRO</option><option>ENTERPRISE</option></select>
+          <div class="stat-card-bd">
+            <div class="grid2" style="gap:10px;margin-bottom:10px">
+              <div class="field" style="margin:0"><label>Nome da loja</label><input id="ns-name" placeholder="Ex: Loja ABC"></div>
+              <div class="field" style="margin:0"><label>Email da loja</label><input id="ns-email" type="email" placeholder="contato@loja.com"></div>
+              <div class="field" style="margin:0"><label>Nome do responsável</label><input id="ns-owner-name" placeholder="João Silva"></div>
+              <div class="field" style="margin:0"><label>Email do responsável</label><input id="ns-owner-email" type="email" placeholder="joao@loja.com"></div>
+              <div class="field" style="margin:0"><label>Senha do responsável</label><input id="ns-owner-pass" type="password" placeholder="Mínimo 8 caracteres"></div>
+              <div class="field" style="margin:0"><label>Plano</label><select id="ns-plan"><option value="FREE">FREE</option><option value="BASIC">BASIC</option><option value="PRO" selected>PRO</option><option value="ENTERPRISE">ENTERPRISE</option></select></div>
             </div>
-            <button class="btn btn-ghost btn-sm" id="btn-reload-stores">↻ Atualizar</button>
+            <button class="btn btn-primary" id="btn-create-store">Criar loja</button>
           </div>
-          <div class="tw"><table><thead><tr><th>Nome</th><th>Slug</th><th>Email</th><th>Plano</th><th>Produtos</th><th>Pedidos</th><th>Status</th><th>API Key</th><th></th></tr></thead><tbody id="stores-tb"><tr><td colspan="9" class="empty">Carregando...</td></tr></tbody></table></div>
-          <div id="stores-pg" class="flex mt" style="justify-content:flex-end;gap:8px"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-hd stat-card-hd-actions">
+            <div class="stat-card-hd-main">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>
+              <span class="stat-card-title">Lojas cadastradas</span>
+            </div>
+            <div class="stat-card-actions">
+              <input id="stores-q" type="search" placeholder="Buscar nome, email ou slug...">
+              <select id="stores-plan-filter"><option value="">Todos os planos</option><option>FREE</option><option>BASIC</option><option>PRO</option><option>ENTERPRISE</option></select>
+              <button class="btn btn-ghost btn-sm" id="btn-reload-stores">↻ Atualizar</button>
+            </div>
+          </div>
+          <div class="stat-card-bd">
+            <div class="tw"><table><thead><tr><th>Nome</th><th>Slug</th><th>Email</th><th>Plano</th><th>Produtos</th><th>Pedidos</th><th>Status</th><th>API Key</th><th></th></tr></thead><tbody id="stores-tb"><tr><td colspan="9" class="empty">Carregando...</td></tr></tbody></table></div>
+            <div id="stores-pg" class="flex mt" style="justify-content:flex-end;gap:8px"></div>
+          </div>
         </div>
       </div>
 
       <!-- ── ADMIN: Tokens por Loja ── -->
       <div id="page-store-tokens" class="page">
-        <div class="card">
-          <div class="card-hd">Selecionar loja</div>
-          <div class="fr">
-            <div class="field"><label>Loja</label><select id="st-store-sel" style="background:#fff;border:1.5px solid var(--border-input);border-radius:10px;padding:9px 12px;color:var(--text-input);width:100%"><option value="">Selecione uma loja...</option></select></div>
-            <button class="btn btn-ghost" id="btn-load-store-tokens">Carregar tokens</button>
+        <div class="stat-card">
+          <div class="stat-card-hd">
+            <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m2 8l9.732-4.866a.6.6 0 0 1 .536 0L22 8m-2 3v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/></svg></span>
+            <span class="stat-card-title">Selecionar loja</span>
+          </div>
+          <div class="stat-card-bd">
+            <div class="fr">
+              <div class="field"><label>Loja</label><select id="st-store-sel"><option value="">Selecione uma loja...</option></select></div>
+              <button class="btn btn-ghost" id="btn-load-store-tokens">Carregar tokens</button>
+            </div>
           </div>
         </div>
-        <div class="card" id="st-tokens-card" style="display:none">
-          <div class="fb mb">
-            <div class="card-hd" style="margin-bottom:0" id="st-tokens-title">Tokens</div>
-            <div class="flex" style="gap:8px">
+        <div class="stat-card" id="st-tokens-card" style="display:none">
+          <div class="stat-card-hd stat-card-hd-actions">
+            <div class="stat-card-hd-main">
+              <span class="stat-card-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M19.543 4.471A6.501 6.501 0 0 0 8.618 7.255a6.52 6.52 0 0 0 .34 4.447L2.5 18.179V21.5h3.364l-.318-1.99l1.965.33l1.67-1.661l-.318-1.99l1.976.318l1.47-1.472a6.5 6.5 0 0 0 8.06-2.261a6.52 6.52 0 0 0-.838-8.338z"/><path d="M16.99 10.23a2.258 2.258 0 0 1-3.476-2.853a2.26 2.26 0 0 1 3.477-.339a2.275 2.275 0 0 1 0 3.192"/></g></svg></span>
+              <span class="stat-card-title" id="st-tokens-title">Tokens</span>
+            </div>
+            <div class="stat-card-actions">
               <button class="btn btn-primary btn-sm" id="btn-gen-store-token">Gerar token</button>
               <button class="btn btn-ghost btn-sm" id="btn-reload-store-tokens">↻ Atualizar</button>
             </div>
           </div>
-          <div class="tw"><table><thead><tr><th>Nome</th><th>Token</th><th>Criado</th><th>Expira</th><th>Último uso</th><th>Status</th><th></th></tr></thead><tbody id="st-tokens-tb"><tr><td colspan="7" class="empty">Carregando...</td></tr></tbody></table></div>
+          <div class="stat-card-bd">
+            <div class="tw"><table><thead><tr><th>Nome</th><th>Token</th><th>Criado</th><th>Expira</th><th>Último uso</th><th>Status</th><th></th></tr></thead><tbody id="st-tokens-tb"><tr><td colspan="7" class="empty">Carregando...</td></tr></tbody></table></div>
+          </div>
         </div>
       </div>
     </main>

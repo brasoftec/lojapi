@@ -24,7 +24,11 @@ const limiter = rateLimit({
   max: Number(process.env.RATE_LIMIT_MAX) || 100,
   message: { error: 'Muitas requisições. Tente novamente em alguns minutos.' },
 });
-app.use('/api/', limiter);
+app.use('/api/', (req, res, next) => {
+  // Login não consome cota (evita bloquear o painel /dev em desenvolvimento)
+  if (req.path.startsWith('/v1/auth/')) return next();
+  return limiter(req, res, next);
+});
 
 // ─── Parsers ──────────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));

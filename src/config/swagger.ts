@@ -20,15 +20,94 @@ Integração de ERPs e painéis com lojas isoladas por \`storeId\`.
 | Loja (JWT) | \`Authorization: Bearer <token>\` |
 | Loja / ERP (API Key) | \`X-API-Key: <apiKey ou tk-ot...bra>\` |
 
-### Fluxo ERP
+---
+
+## Como integrar seu ERP
+
+### 1. Gere um Token ERP
+
+\`POST /api/v1/tokens\` — copie o token gerado. **Ele só aparece uma vez.**
+
 \`\`\`
-1. Admin login        → POST /api/v1/auth/admin/login
-2. Cadastrar loja     → POST /api/v1/cadastrar
-3. Gerar token ERP    → POST /api/v1/tokens  (retorna tk-ot...bra)
-4. Copiar .env        → GET  /api/v1/tokens/env
-5. Sincronizar prod.  → POST /api/v1/produtos
-6. Configurar webhook → POST /api/v1/webhook/configurar
-7. Atualizar status   → PATCH /api/v1/pedidos/:id/status
+X-API-Key: tk-ot...sua-chave...bra
+\`\`\`
+
+### 2. Configure o .env do ERP
+
+\`GET /api/v1/tokens/env\` — copie o bloco pronto e cole no \`.env\` do seu ERP.
+
+\`\`\`
+LOJAPI_BASE_URL=https://api.ofertatop.com.br/api/v1
+LOJAPI_API_KEY=tk-ot...bra
+LOJAPI_STORE_ID=uuid-da-loja
+LOJAPI_STORE_SLUG=slug-da-loja
+\`\`\`
+
+### 3. Teste a conexão
+
+Confirme que o token está funcionando consultando os dados da loja.
+
+\`\`\`bash
+curl https://api.ofertatop.com.br/api/v1/loja \\
+  -H "X-API-Key: $LOJAPI_API_KEY"
+\`\`\`
+
+### 4. Configure o Webhook
+
+\`POST /api/v1/webhook/configurar\` — seu ERP deve responder **HTTP 200**.
+
+\`\`\`json
+{ "webhookUrl": "https://seu-erp.com/api/webhook/lojapi" }
+\`\`\`
+
+### 5. Sincronize o catálogo
+
+Envie produtos via \`POST /api/v1/produtos\`. Atualize estoque com \`PATCH /api/v1/produtos/:id/estoque\`.
+
+\`\`\`json
+{ "name": "Produto", "price": 99.90, "sku": "SKU-001", "stock": 50 }
+\`\`\`
+
+### 6. Receba pedidos via Webhook
+
+Quando um pedido for criado, seu ERP recebe o evento \`order.created\` automaticamente.
+
+\`\`\`json
+{
+  "event": "order.created",
+  "data": {
+    "orderNumber": "#000001",
+    "total": 199.90,
+    "customer": {},
+    "items": []
+  }
+}
+\`\`\`
+
+### 7. Atualize status dos pedidos
+
+Fluxo: \`PENDING → CONFIRMED → PROCESSING → SHIPPED → DELIVERED\`
+
+\`\`\`http
+PATCH /api/v1/pedidos/:id/status
+{ "status": "SHIPPED" }
+
+PATCH /api/v1/pedidos/:id/pagamento
+{ "paymentStatus": "PAID", "paymentMethod": "pix" }
+\`\`\`
+
+### 8. Múltiplas lojas
+
+Cada loja tem seu próprio token. Use um token diferente por loja e identifique pelo \`LOJAPI_STORE_ID\`.
+
+\`\`\`
+# Loja A
+LOJA_A_API_KEY=tk-ot...bra
+LOJA_A_STORE_ID=uuid-loja-a
+
+# Loja B
+LOJA_B_API_KEY=tk-ot...bra
+LOJA_B_STORE_ID=uuid-loja-b
 \`\`\`
       `,
       contact: { name: 'Suporte', email: 'suporte@ofertatop.com.br' },

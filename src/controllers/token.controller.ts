@@ -82,13 +82,7 @@ export class TokenController {
         orderBy: { createdAt: 'desc' },
       });
 
-      // Mascara os tokens: mostra prefixo tk-ot... e sufixo ...bra
-      const masked = tokens.map(t => ({
-        ...t,
-        token: `${t.token.substring(0, 10)}...${t.token.substring(t.token.length - 6)}`,
-      }));
-
-      res.json(masked);
+      res.json(tokens);
     } catch (err) {
       next(err);
     }
@@ -106,12 +100,9 @@ export class TokenController {
 
       if (!token) throw new AppError('Token não encontrado', 404);
 
-      await prisma.integrationToken.update({
-        where: { id },
-        data: { active: false },
-      });
+      await prisma.integrationToken.delete({ where: { id } });
 
-      res.json({ message: 'Token revogado com sucesso' });
+      res.json({ message: 'Token removido com sucesso' });
     } catch (err) {
       next(err);
     }
